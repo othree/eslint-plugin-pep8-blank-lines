@@ -1,4 +1,16 @@
 
+const BLOCK_DECLARATIONS = [
+  'FunctionDeclaration',
+  'ClassDeclaration',
+];
+
+const BLOCK_DECLARATION_STARTS = BLOCK_DECLARATIONS.map(name => `${name}Start`);
+
+const COMMENTS = [
+  'Block',
+  'Line',
+];
+
 
 const findBeforeFirst = (target, tokens) => {
   let prev = null;
@@ -13,7 +25,7 @@ const findBeforeFirst = (target, tokens) => {
 
 
 exports.findFirstTokenBeforeBody = (node, context) => {
-  if (node.type === 'ClassDeclaration') {
+  if (BLOCK_DECLARATIONS.includes(node.type)) {
     return context.getTokenBefore(node.body);
     // return findBeforeFirst('Punctuator', context.getTokens(node));
   }
@@ -31,19 +43,10 @@ exports.blockStartNode = cursorLine => {
 };
 
 
-const BLOCK_DECLARATIONS = [
-  'ClassDeclarationStart',
-];
-
-const COMMENTS = [
-  'Block',
-  'Line',
-];
-
 exports.ruleFor = info => {
   // console.log('ruleFor', info);
   let rule = 'one';
-  if (BLOCK_DECLARATIONS.includes(info.prev.type)) {
+  if (BLOCK_DECLARATION_STARTS.includes(info.prev.type)) {
     rule = 'maxone';
   } else if (info.level === 0) {
     rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
@@ -60,6 +63,7 @@ exports.ruleFor = info => {
     }
   }
 
+  console.log(rule);
   return rule;
 }
 
