@@ -44,20 +44,24 @@ exports.blockStartNode = cursorLine => {
 
 
 exports.ruleFor = info => {
-  // console.log('ruleFor', info);
-  let rule = 'one';
+  let rule = 'maxone';
   if (BLOCK_DECLARATION_STARTS.includes(info.prev.type)) {
     rule = 'maxone';
   } else if (info.level === 0) {
-    rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
-  } else if (info.prev.type === 'BlockStart') {
-    rule = 'zero';
+    if (BLOCK_DECLARATIONS.includes(info.prev.type)) {
+      rule = 'two';
+    } else {
+      rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
+    }
   } else {
-    rule = 'one';
+    if (BLOCK_DECLARATIONS.includes(info.prev.type)) {
+      rule = 'one';
+    } else {
+      rule = 'maxone';
+    }
   }
 
   if (rule.indexOf('max') === -1) {
-    console.log('[]', rule, info.prev.type);
     if (COMMENTS.includes(info.prev.type)) {
       rule = `zero${rule}`;
     }

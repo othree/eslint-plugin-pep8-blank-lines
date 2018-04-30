@@ -13,12 +13,15 @@ ruleTester.run('pep8-blank-lines', rule, {
     `
 class A {
     constructor () {}
-
     methodA () {}
 }
 
 
-function func () {}
+function func () {
+    var a = 1;
+
+    var b = 1;
+}
 
 
 // Comment Line
@@ -37,10 +40,7 @@ class B {
     `
 
 class C {
-    constructor () {}
-    methodA () {}
 }
-
 
 class D {}
     `,
