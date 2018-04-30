@@ -1,6 +1,9 @@
 const rule = require('../rule.js');
+const load = require('./load.js');
 
 const RuleTester = require('eslint').RuleTester;
+
+const readfile = load.readfile;
 
 const ruleTester = new RuleTester({
   parser: 'babel-eslint',
@@ -10,40 +13,11 @@ const message = 'invalid';
 
 ruleTester.run('pep8-blank-lines', rule, {
   valid: [
-    `
-class A {
-    constructor () {}
-    methodA () {}
-}
-
-
-function func () {
-    var a = 1;
-
-    var b = 1;
-}
-
-
-// Comment Line
-
-
-/* 
- * comments
- */
-class B {
-}
-    `,
+    readfile('test/valids/index.js'),
   ],
   invalid: [
     {
-      code:
-    `
-
-class C {
-}
-
-class D {}
-    `,
+      code: readfile('test/invalids/index.js'),
       errors: [{ message }],
     },
   ],
