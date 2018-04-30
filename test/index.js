@@ -11,7 +11,9 @@ const message = 'invalid';
 ruleTester.run('pep8-blank-lines', rule, {
   valid: [
     `
-class A {}
+class A {
+    constructor () {}
+}
 
 
 // Comment Line

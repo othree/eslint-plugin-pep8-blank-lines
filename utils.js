@@ -47,6 +47,8 @@ exports.ruleFor = info => {
     rule = 'maxone';
   } else if (info.level === 0) {
     rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
+  } else if (info.prev.type === 'BlockStart') {
+    rule = 'zero';
   } else {
     rule = 'one';
   }
