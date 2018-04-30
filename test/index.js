@@ -11,21 +11,16 @@ const message = 'invalid';
 ruleTester.run('pep8-blank-lines', rule, {
   valid: [
     `
-
 class A {}
 
 
-// XD
+// Comment Line
 
 
-/**
- * @class B
+/* 
+ * comments
  */
 class B {
-  constructor () {
-  }
-
-  methodA () {}
 }
     `,
   ],
@@ -36,8 +31,6 @@ class B {
 
 class C {}
 
-
-// comment
 class D {}
     `,
       errors: [{ message }],
