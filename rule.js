@@ -1,6 +1,6 @@
 
 const RULES = require('./blank-line-rules');
-const UTILS =  require('./utils');
+const UTILS = require('./utils');
 
 
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
@@ -39,12 +39,6 @@ const walk = (node, context, info) => {
     // console.log(node.loc);
     cursorLine = 0;
   }
-
-  // console.log(`<<< ${info.prev.type}`);
-  // console.log('>>>', node.type);
-
-  let rule = 'two';
-  if (info.level > 0) { rule = 'one'; }
 
   if (node.type !== 'Program') {
     console.log('start comments');
@@ -87,17 +81,13 @@ const walk = (node, context, info) => {
   }
 
   info.prev = node;
-
 };
 
 
 module.exports = {
   create: function (context) {
-    const sourceCode = context.getSourceCode();
-
     return {
       'Program:exit': function (node) {
-        const lines = sourceCode.lines;
         const info = {
           level: 0,
           prev: { 
@@ -107,10 +97,8 @@ module.exports = {
               end: { line: 0 },
             } 
           },
-          current: null,
+          current: node,
         };
-        // console.log(lines.length);
-        // console.log(node);
 
         walk(node, context, info);
       },
