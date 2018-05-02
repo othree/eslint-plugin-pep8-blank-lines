@@ -1,21 +1,13 @@
 
 
-class A {
-    constructor () {}
-    methodA () {}
-}
+var a = 1;
+var b = 1;
 
 
-function func () {
-    var a = 1;
-
-    var b = 1;
-}
+class A {}
 
 
 // Comment Line
-
-
 /* 
  * comments
  */

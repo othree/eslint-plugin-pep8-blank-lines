@@ -1,6 +1,11 @@
 
 
-class C {
-}
+var a = 1;
 
-class D {}
+
+var b = 1;
+// line
+
+
+class B {
+}
