@@ -65,7 +65,7 @@ const isComment = node =>
 
 
 exports.findFirstTokenBeforeBody = (node, context) => {
-  if (BLOCK_DECLARATIONS.includes(node.type)) {
+  if (BLOCK_DECLARATIONS.includes(node.type) || BLOCK_EXPRESSIONS.includes(node.type)) {
     return context.getTokenBefore(node.body);
   }
 };
@@ -86,9 +86,10 @@ exports.ruleFor = info => {
   let rule = 'maxone';
   if (isBlockStart(info.prev)) {
     rule = 'maxone';
+  } else if (info.prev.type === 'Punctuator' && info.prev.value === '=') {
+    rule = 'maxone';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {
-      console.log('block two')
       rule = 'two';
     } else if (isStatement(info.prev) && isStatement(info.current)) {
       rule = 'maxtwo';
@@ -97,7 +98,6 @@ exports.ruleFor = info => {
     } else if (isDeclarator(info.current)) {
       rule = 'maxzero';
     } else {
-      console.log('else two')
       rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
     }
   } else {
@@ -114,7 +114,6 @@ exports.ruleFor = info => {
     }
   }
 
-  console.log(rule);
   return rule;
 }
 

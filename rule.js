@@ -35,6 +35,14 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 
 
 const walk = (node, context, info) => {
+  /**
+   * Transparent Node
+   * VariableDeclarator
+   */
+  if (node.type === 'VariableDeclarator') {
+    return walk(node.init, context, info);
+  }
+
   let cursorLine = node.loc.start.line;
   if (node.type === 'Program') {
     // console.log(node.loc);
@@ -46,8 +54,8 @@ const walk = (node, context, info) => {
     const comments = context.getCommentsBefore(node);
 
     recursiveLinesBetween([info.prev, ...comments, node], info, (ok, n, args) => {
-      if (!ok) { console.log('wow2', args[0]); }
-      if (!ok) { console.log('wow3', args[1]); }
+      if (!ok) { console.log('[report][prev]', args[0]); }
+      if (!ok) { console.log('[report][curr]', args[1]); }
       if (!ok) { context.report(node, 'invalid'); }
     });
     console.log('passed comments');
@@ -82,20 +90,11 @@ const walk = (node, context, info) => {
   }
 
   if (node.declarations && node.declarations.length) {
-    info.prev = context.getTokenBefore(node.declarations[0])
+    info.prev = context.getTokenAfter(node.declarations[0].id);
     for (const n of node.declarations) {
-      // console.log('[info]', info.prev.type);
-      // console.log('[n]', n);
       walk(n, context, info);
       info.prev = n;
     }
-  }
-
-  /**
-   * VariableDeclarator
-   */
-  if (node.init) {
-    walk(node.init, context, info);
   }
 
   info.prev = node;
