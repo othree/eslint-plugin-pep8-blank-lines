@@ -8,28 +8,30 @@ const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
 
 
-const linesBetween = (top, bottom, rule, callback) => callback(rule(top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
+const linesBetween = (top, bottom, rule, callback) =>
+  callback(rule(top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
 
 
 /**
  * @description Lookup empty lines from top to bottom
  */
 const recursiveLinesBetween = (nodes, info, callback) => {
-  if (nodes.length === 0) { return; }
+  if (nodes.length === 0) { return null; }
   if (nodes.length === 1) { return nodes[0]; }
 
   let top = nodes.shift();
 
-  for (let i = 0; i < nodes.length; i++) {
-    let bottom = nodes[i];
+  for (let i = 0; i < nodes.length; i += 1) {
+    const bottom = nodes[i];
     info.current = bottom;
+    console.log(ruleFor(info));
     linesBetween(top, bottom, RULES[ruleFor(info)], callback);
     top = bottom;
     info.prev = top;
   }
 
   return top;
-}
+};
 
 
 const walk = (node, context, info) => {
@@ -43,10 +45,10 @@ const walk = (node, context, info) => {
     console.log('start comments');
     const comments = context.getCommentsBefore(node);
 
-    recursiveLinesBetween([info.prev, ...comments, node], info, (ok, node, args) => {
-      if (!ok) { console.log('wow2', args[0]); };
-      if (!ok) { console.log('wow3', args[1]); };
-      if (!ok) { context.report(node, 'invalid') };
+    recursiveLinesBetween([info.prev, ...comments, node], info, (ok, n, args) => {
+      if (!ok) { console.log('wow2', args[0]); }
+      if (!ok) { console.log('wow3', args[1]); }
+      if (!ok) { context.report(node, 'invalid'); }
     });
     console.log('passed comments');
   }
@@ -55,8 +57,8 @@ const walk = (node, context, info) => {
 
   if (node.body) {
     if (node.type !== 'Program' && Array.isArray(node.body)) {
-      console.log('{level +1}')
-      info.level++;
+      console.log('{level +1}');
+      info.level += 1;
       info.prev = blockStartNode(cursorLine);
     } else {
       info.prev = pretendStart(node, findFirstTokenBeforeBody(node, context)) || info.prev;
@@ -64,19 +66,36 @@ const walk = (node, context, info) => {
 
     const body = Array.isArray(node.body) ? node.body : [node.body];
 
-    console.log(`start body ${node.type}-${info.level}`)
+    console.log(`start body ${node.type}-${info.level}`);
     for (const n of body) {
-      console.log('[info]', info.prev.type);
+      // console.log('[info]', info.prev.type);
       // console.log('[n]', n);
       walk(n, context, info);
       info.prev = n;
     }
-    console.log(`end body ${node.type}-${info.level}`)
+    console.log(`end body ${node.type}-${info.level}`);
 
     if (node.type !== 'Program' && Array.isArray(node.body)) {
-      console.log('{level -1}')
+      console.log('{level -1}');
       info.level--;
     }
+  }
+
+  if (node.declarations && node.declarations.length) {
+    info.prev = context.getTokenBefore(node.declarations[0])
+    for (const n of node.declarations) {
+      // console.log('[info]', info.prev.type);
+      // console.log('[n]', n);
+      walk(n, context, info);
+      info.prev = n;
+    }
+  }
+
+  /**
+   * VariableDeclarator
+   */
+  if (node.init) {
+    walk(node.init, context, info);
   }
 
   info.prev = node;

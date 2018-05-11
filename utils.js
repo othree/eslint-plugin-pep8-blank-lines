@@ -17,22 +17,14 @@ const DECLARATIONS = [
   'VariableDeclaration',
 ];
 
+const DECCLARATORS = [
+  'VariableDeclarator',
+];
+
 const COMMENTS = [
   'Block',
   'Line',
 ];
-
-
-const findBeforeFirst = (target, tokens) => {
-  let prev = null;
-  for (const token of tokens) {
-    if (token.type === target) {
-      return token;
-    }
-    prev = token;
-  }
-  throw new Error(`Unexpected token <${target}> not found`);
-};
 
 
 const isBlock = node => {
@@ -42,11 +34,13 @@ const isBlock = node => {
   /*
    * Also treat as block level node:
    * 
-   *     var foo = function () {};
+   *     var foo = function () {
+   *     };
    *
    */
   if (node.type === 'VariableDeclaration' && node.declarations.length === 1) {
-    if (BLOCK_EXPRESSIONS.includes(node.declarations[0].init.type)) {
+    if (BLOCK_EXPRESSIONS.includes(node.declarations[0].init.type)
+     && node.declarations[0].loc.start.line !== node.declarations[0].loc.end.line) {
       return true;
     }
   }
@@ -54,19 +48,20 @@ const isBlock = node => {
 };
 
 
-const isBlockStart = node => {
-  return BLOCK_DECLARATION_STARTS.includes(node.type) || BLOCK_EXPRESSION_STARTS.includes(node.type);
-};
+const isBlockStart = node =>
+  BLOCK_DECLARATION_STARTS.includes(node.type) || BLOCK_EXPRESSION_STARTS.includes(node.type);
 
 
-const isStatement = node => {
-  return DECLARATIONS.includes(node.type);
-};
+const isStatement = node =>
+  DECLARATIONS.includes(node.type);
 
 
-const isComment = node => {
-  return COMMENTS.includes(node.type);
-};
+const isDeclarator = node =>
+  DECCLARATORS.includes(node.type);
+
+
+const isComment = node =>
+  COMMENTS.includes(node.type);
 
 
 exports.findFirstTokenBeforeBody = (node, context) => {
@@ -77,12 +72,12 @@ exports.findFirstTokenBeforeBody = (node, context) => {
 
 
 exports.blockStartNode = cursorLine => {
-  return { 
+  return {
     type: 'BlockStart',
-    loc: { 
+    loc: {
       start: { line: cursorLine },
-      end: { line: cursorLine }
-    } 
+      end: { line: cursorLine },
+    },
   };
 };
 
@@ -93,10 +88,16 @@ exports.ruleFor = info => {
     rule = 'maxone';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {
+      console.log('block two')
       rule = 'two';
     } else if (isStatement(info.prev) && isStatement(info.current)) {
       rule = 'maxtwo';
+    } else if (isDeclarator(info.prev)) {
+      rule = 'maxone';
+    } else if (isDeclarator(info.current)) {
+      rule = 'maxzero';
     } else {
+      console.log('else two')
       rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
     }
   } else {
