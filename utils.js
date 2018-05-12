@@ -27,20 +27,20 @@ const COMMENTS = [
 ];
 
 
-const isBlock = node => {
+const isBlock = (node) => {
   if (BLOCK_DECLARATIONS.includes(node.type)) {
     return true;
   }
   /*
    * Also treat as block level node:
-   * 
+   *
    *     var foo = function () {
    *     };
    *
    */
   if (node.type === 'VariableDeclaration' && node.declarations.length === 1) {
-    if (BLOCK_EXPRESSIONS.includes(node.declarations[0].init.type)
-     && node.declarations[0].loc.start.line !== node.declarations[0].loc.end.line) {
+    if (BLOCK_EXPRESSIONS.includes(node.declarations[0].init.type) &&
+      node.declarations[0].loc.start.line !== node.declarations[0].loc.end.line) {
       return true;
     }
   }
@@ -68,10 +68,11 @@ exports.findFirstTokenBeforeBody = (node, context) => {
   if (BLOCK_DECLARATIONS.includes(node.type) || BLOCK_EXPRESSIONS.includes(node.type)) {
     return context.getTokenBefore(node.body);
   }
+  return null;
 };
 
 
-exports.blockStartNode = cursorLine => {
+exports.blockStartNode = (cursorLine) => {
   return {
     type: 'BlockStart',
     loc: {
@@ -82,7 +83,7 @@ exports.blockStartNode = cursorLine => {
 };
 
 
-exports.ruleFor = info => {
+exports.ruleFor = (info) => {
   let rule = 'maxone';
   if (isBlockStart(info.prev)) {
     rule = 'maxone';
@@ -115,14 +116,15 @@ exports.ruleFor = info => {
   }
 
   return rule;
-}
+};
 
 
 exports.pretendStart = (node, token) => {
   if (token) {
     return {
       type: `${node.type}Start`,
-      loc: token.loc
-    }
+      loc: token.loc,
+    };
   }
-}
+  return null;
+};

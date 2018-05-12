@@ -1,3 +1,5 @@
+/* global console */
+
 const RULES = require('./blank-line-rules');
 const UTILS = require('./utils');
 
@@ -34,7 +36,7 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 };
 
 
-const walk = (node, context, info) => {
+const walk = function (node, context, info) {
   /**
    * Transparent Node
    * VariableDeclarator
@@ -85,7 +87,7 @@ const walk = (node, context, info) => {
 
     if (node.type !== 'Program' && Array.isArray(node.body)) {
       console.log('{level -1}');
-      info.level--;
+      info.level -= 1;
     }
   }
 
@@ -107,12 +109,12 @@ module.exports = {
       'Program:exit': function (node) {
         const info = {
           level: 0,
-          prev: { 
+          prev: {
             type: 'ProgramStart',
-            loc: { 
+            loc: {
               start: { line: 0 },
               end: { line: 0 },
-            } 
+            },
           },
           current: null,
         };
