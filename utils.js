@@ -21,6 +21,11 @@ const DECCLARATORS = [
   'VariableDeclarator',
 ];
 
+const FUNCTIONS = [
+  'FunctionDeclaration',
+  'FunctionExpression',
+];
+
 const COMMENTS = [
   'Block',
   'Line',
@@ -64,6 +69,9 @@ const isComment = node =>
   COMMENTS.includes(node.type);
 
 
+const isInParen = info =>
+  (info.context && info.context.type === 'FunctionParams');
+
 const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
 
@@ -71,6 +79,14 @@ const isAssign = token =>
 exports.findFirstTokenBeforeBody = (node, context) => {
   if (BLOCK_DECLARATIONS.includes(node.type) || BLOCK_EXPRESSIONS.includes(node.type)) {
     return context.getTokenBefore(node.body);
+  }
+  return null;
+};
+
+
+exports.findFirstTokenBeforeParams = (node, context) => {
+  if (FUNCTIONS.includes(node.type) && node.params[0]) {
+    return context.getTokenBefore(node.params[0]);
   }
   return null;
 };
@@ -92,6 +108,8 @@ exports.ruleFor = (info) => {
   if (isBlockStart(info.prev)) {
     rule = 'maxzero';
   } else if (isAssign(info.prev)) {
+    rule = 'maxzero';
+  } else if (isInParen(info)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {

@@ -5,6 +5,7 @@ const UTILS = require('./utils');
 
 
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
+const findFirstTokenBeforeParams = UTILS.findFirstTokenBeforeParams;
 const blockStartNode = UTILS.blockStartNode;
 const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
@@ -52,7 +53,7 @@ const walk = function (node, context, info) {
   }
 
   if (node.type !== 'Program') {
-    console.log('start comments');
+    // console.log('start comments');
     const comments = context.getCommentsBefore(node);
 
     recursiveLinesBetween([info.prev, ...comments, node], info, (ok, n, args) => {
@@ -60,10 +61,21 @@ const walk = function (node, context, info) {
       if (!ok) { console.log('[report][curr]', args[1]); }
       if (!ok) { context.report(node, 'invalid'); }
     });
-    console.log('passed comments');
+    // console.log('passed comments');
   }
 
-  if (node.params) {}
+  if (node.params && node.params.length) {
+    const currContext = info.context;
+    info.context = {type: 'FunctionParams'};
+    console.log(node);
+    info.prev = findFirstTokenBeforeParams(node, context);
+    console.log(info.prev);
+    for (const n of node.params) {
+      walk(n, context, info);
+      info.prev = n;
+    }
+    info.context = currContext;
+  }
 
   if (node.body) {
     if (node.type !== 'Program' && Array.isArray(node.body)) {
