@@ -64,6 +64,10 @@ const isComment = node =>
   COMMENTS.includes(node.type);
 
 
+const isAssign = token =>
+  (token.type === 'Punctuator' && token.value === '=');
+
+
 exports.findFirstTokenBeforeBody = (node, context) => {
   if (BLOCK_DECLARATIONS.includes(node.type) || BLOCK_EXPRESSIONS.includes(node.type)) {
     return context.getTokenBefore(node.body);
@@ -86,9 +90,9 @@ exports.blockStartNode = (cursorLine) => {
 exports.ruleFor = (info) => {
   let rule = 'maxone';
   if (isBlockStart(info.prev)) {
-    rule = 'maxone';
-  } else if (info.prev.type === 'Punctuator' && info.prev.value === '=') {
-    rule = 'maxone';
+    rule = 'maxzero';
+  } else if (isAssign(info.prev)) {
+    rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {
       rule = 'two';
