@@ -38,21 +38,12 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 
 
 const walk = function (node, context, info) {
-  /**
-   * Transparent Node
-   * VariableDeclarator
-   */
-  if (node.type === 'VariableDeclarator') {
-    return walk(node.init, context, info);
-  }
-
   let cursorLine = node.loc.start.line;
   if (node.type === 'Program') {
     cursorLine = 0;
   }
 
   if (node.type !== 'Program') {
-    // console.log('start comments');
     const comments = context.getCommentsBefore(node);
 
     recursiveLinesBetween([info.prev, ...comments, node], info, (ok, n, args) => {
@@ -60,14 +51,32 @@ const walk = function (node, context, info) {
       if (!ok) { console.log('[report][curr]', args[1]); }
       if (!ok) { context.report(node, 'invalid'); }
     });
-    // console.log('passed comments');
   }
 
-  if (node.value && node.value.type) {
-    if (node.type === 'ClassProperty') {
-      info.prev = context.getTokenAfter(node.key);
+  // props by order
+  // declarations[] > init > test > update > consequent > alternate > params[] > body[] or body > value 
+
+  if (node.declarations && node.declarations.length) {
+    info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
+    for (const n of node.declarations) {
+      walk(n, context, info);
+      info.prev = n;
     }
-    walk(node.value, context, info);
+  }
+
+  if (node.init) {
+    walk(node.init, context, info);
+    info.prev = node.init;
+  }
+
+  if (node.test) {
+    walk(node.test, context, info);
+    info.prev = node.test;
+  }
+
+  if (node.update) {
+    walk(node.update, context, info);
+    info.prev = node.update;
   }
 
   if (node.params && node.params.length) {
@@ -107,12 +116,11 @@ const walk = function (node, context, info) {
     }
   }
 
-  if (node.declarations && node.declarations.length) {
-    info.prev = context.getTokenAfter(node.declarations[0].id);
-    for (const n of node.declarations) {
-      walk(n, context, info);
-      info.prev = n;
+  if (node.value && node.value.type) {
+    if (node.type === 'ClassProperty') {
+      info.prev = context.getTokenAfter(node.key);
     }
+    walk(node.value, context, info);
   }
 
   info.prev = node;
