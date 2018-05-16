@@ -54,7 +54,23 @@ const walk = function (node, context, info) {
   }
 
   // props by order
-  // declarations[] > init > test > update > consequent > alternate > params[] > body[] or body > value 
+  // class: decorators > id > superClass > body
+  // class prop: key > value
+  // method def: key > value
+  // if: test > consequent > alternate
+  // while: test > body
+  // try: block > handler > finally
+  // block: block
+  // for: init > test > update > body
+  // object: properties
+  // property: key > value
+  // label: body
+  // literal: value
+  // exp: left > right
+  // cal exp: arguments
+  // member exp: property
+  //
+  // all: decorators > > init > test > update > consequent > alternate > params[] > body[] or body > properties > property > value 
 
   if (node.declarations && node.declarations.length) {
     info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
