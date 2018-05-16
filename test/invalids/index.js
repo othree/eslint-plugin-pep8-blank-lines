@@ -1,10 +1,10 @@
-var a = 1;
-var b = 1;
+import a from 'a';
+import b from 'b';
 
+import c from 'c';
 
 var c = function (
   // Comment
-
   a, b) {
   let e = 2;
 
