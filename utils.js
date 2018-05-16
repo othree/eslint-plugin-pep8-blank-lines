@@ -5,7 +5,7 @@ const IMPORTS = [
 
 const EXPORTS = [
   'ExportNamedDeclaration',
-  'ExportDefaultDeclaration'
+  'ExportDefaultDeclaration',
 ];
 
 const BLOCK_DECLARATIONS = [
@@ -92,6 +92,11 @@ const isInParen = info =>
 
 const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
+
+
+exports.findTokenBefore = (node, context) => {
+  return context.getTokenBefore(node);
+};
 
 
 exports.findFirstTokenBeforeBody = (node, context) => {

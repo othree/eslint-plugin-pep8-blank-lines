@@ -4,6 +4,7 @@ const RULES = require('./blank-line-rules');
 const UTILS = require('./utils');
 
 
+const findTokenBefore = UTILS.findTokenBefore;
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
 const findFirstTokenBeforeParams = UTILS.findFirstTokenBeforeParams;
 const blockStartNode = UTILS.blockStartNode;
@@ -38,6 +39,10 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 
 
 const walk = function (node, context, info) {
+  if (!node.type) {
+    return;
+  }
+
   let cursorLine = node.loc.start.line;
   if (node.type === 'Program') {
     cursorLine = 0;
@@ -58,11 +63,14 @@ const walk = function (node, context, info) {
   // class prop: key > value
   // method def: key > value
   // if: test > consequent > alternate
+  // switch: discriminat > cases
+  // case: test? > consequent
   // while: test > body
   // try: block > handler > finally
   // block: block
   // for: init > test > update > body
   // object: properties
+  // array: elements
   // property: key > value
   // label: body
   // literal: value
@@ -70,7 +78,7 @@ const walk = function (node, context, info) {
   // cal exp: arguments
   // member exp: property
   //
-  // all: decorators > > init > test > update > consequent > alternate > params[] > body[] or body > properties > property > value 
+  // decorators > declarations > init > test > update > cases > consequent > alternate > params[] > body[] or body > properties > elements > property > value
 
   if (node.declarations && node.declarations.length) {
     info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
@@ -81,6 +89,7 @@ const walk = function (node, context, info) {
   }
 
   if (node.init) {
+    info.prev = findTokenBefore(node.init, context);
     walk(node.init, context, info);
     info.prev = node.init;
   }
@@ -93,6 +102,24 @@ const walk = function (node, context, info) {
   if (node.update) {
     walk(node.update, context, info);
     info.prev = node.update;
+  }
+
+  if (node.cases && node.cases.length) {
+    info.prev = findTokenBefore(node.cases[0], context);
+    for (const n of node.cases) {
+      walk(n, context, info);
+      info.prev = n;
+    }
+  }
+
+  if (node.consequent) {
+    walk(node.consequent, context, info);
+    info.prev = node.consequent;
+  }
+
+  if (node.alternate) {
+    walk(node.alternate, context, info);
+    info.prev = node.alternate;
   }
 
   if (node.params && node.params.length) {
@@ -130,6 +157,27 @@ const walk = function (node, context, info) {
       console.log('{level -1}');
       info.level -= 1;
     }
+  }
+
+  if (node.properties && node.properties.length) {
+    info.prev = findTokenBefore(node.properties[0], context);
+    for (const n of node.properties) {
+      walk(n, context, info);
+      info.prev = n;
+    }
+  }
+
+  if (node.elements && node.cases.length) {
+    info.prev = findTokenBefore(node.elements[0], context);
+    for (const n of node.elements) {
+      walk(n, context, info);
+      info.prev = n;
+    }
+  }
+
+  if (node.property) {
+    walk(node.property, context, info);
+    info.prev = node.property;
   }
 
   if (node.value && node.value.type) {
