@@ -33,6 +33,7 @@ const DECCLARATORS = [
 const FUNCTIONS = [
   'FunctionDeclaration',
   'FunctionExpression',
+  'ArrowFunctionExpression',
 ];
 
 const COMMENTS = [

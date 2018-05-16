@@ -48,7 +48,6 @@ const walk = function (node, context, info) {
 
   let cursorLine = node.loc.start.line;
   if (node.type === 'Program') {
-    // console.log(node.loc);
     cursorLine = 0;
   }
 
@@ -64,12 +63,17 @@ const walk = function (node, context, info) {
     // console.log('passed comments');
   }
 
+  if (node.value && node.value.type) {
+    if (node.type === 'ClassProperty') {
+      info.prev = context.getTokenAfter(node.key);
+    }
+    walk(node.value, context, info);
+  }
+
   if (node.params && node.params.length) {
     const currContext = info.context;
     info.context = {type: 'FunctionParams'};
-    console.log(node);
     info.prev = findFirstTokenBeforeParams(node, context);
-    console.log(info.prev);
     for (const n of node.params) {
       walk(n, context, info);
       info.prev = n;

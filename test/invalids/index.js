@@ -1,17 +1,19 @@
-import a from 'a';
-import b from 'b';
-
-import c from 'c';
 
 
-var c = function (
-  // Comment
-  a, b) {
-  let e = 2;
+class A {
+    propA = 1;
+    propB = arg => {
+      var z = arg;
 
-  let f = 2;
-};
+      z + 1;
+    };
 
 
+    constructor () {}
+    methodA () {}
+}
 
-export { c };
+
+class C {
+}
+
