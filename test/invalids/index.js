@@ -3,6 +3,7 @@ import b from 'b';
 
 import c from 'c';
 
+
 var c = function (
   // Comment
   a, b) {
@@ -13,3 +14,4 @@ var c = function (
 
 
 
+export { c };

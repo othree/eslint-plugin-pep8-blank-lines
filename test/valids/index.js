@@ -25,3 +25,7 @@ class B {
 
 
 import d from 'd';
+
+
+export { A };
+export { B };

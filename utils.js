@@ -1,4 +1,13 @@
 
+const IMPORTS = [
+  'ImportDeclaration',
+];
+
+const EXPORTS = [
+  'ExportNamedDeclaration',
+  'ExportDefaultDeclaration'
+];
+
 const BLOCK_DECLARATIONS = [
   'FunctionDeclaration',
   'ClassDeclaration',
@@ -12,10 +21,6 @@ const BLOCK_EXPRESSIONS = [
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
-
-const IMPORTS = [
-  'ImportDeclaration',
-];
 
 const DECLARATIONS = [
   'VariableDeclaration',
@@ -34,6 +39,14 @@ const COMMENTS = [
   'Block',
   'Line',
 ];
+
+
+const isImport = node =>
+  IMPORTS.includes(node.type);
+
+
+const isExport = node =>
+  EXPORTS.includes(node.type);
 
 
 const isBlock = (node) => {
@@ -59,10 +72,6 @@ const isBlock = (node) => {
 
 const isBlockStart = node =>
   BLOCK_DECLARATION_STARTS.includes(node.type) || BLOCK_EXPRESSION_STARTS.includes(node.type);
-
-
-const isImport = node =>
-  IMPORTS.includes(node.type);
 
 
 const isStatement = node =>
@@ -123,6 +132,8 @@ exports.ruleFor = (info) => {
     if (isBlock(info.prev)) {
       rule = 'two';
     } else if (isImport(info.prev) && isImport(info.current)) {
+      rule = 'maxtwo';
+    } else if (isExport(info.prev) && isExport(info.current)) {
       rule = 'maxtwo';
     } else if (isStatement(info.prev) && isStatement(info.current)) {
       rule = 'maxtwo';
