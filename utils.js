@@ -22,6 +22,10 @@ const BLOCK_EXPRESSIONS = [
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
 
+const CONTROL_FLOW_STATEMENTS = [
+  'IfStatement'
+];
+
 const DECLARATIONS = [
   'VariableDeclaration',
 ];
@@ -75,6 +79,10 @@ const isBlockStart = node =>
   BLOCK_DECLARATION_STARTS.includes(node.type) || BLOCK_EXPRESSION_STARTS.includes(node.type);
 
 
+const isControlFlowStatement = node =>
+  CONTROL_FLOW_STATEMENTS.includes(node.type);
+
+
 const isStatement = node =>
   DECLARATIONS.includes(node.type);
 
@@ -88,7 +96,8 @@ const isComment = node =>
 
 
 const isInParen = info =>
-  (info.context && info.context.type === 'FunctionParams');
+  (info.context &&
+    (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
 
 const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
@@ -133,6 +142,8 @@ exports.ruleFor = (info) => {
   } else if (isAssign(info.prev)) {
     rule = 'maxzero';
   } else if (isInParen(info)) {
+    rule = 'maxzero';
+  } else if (info.context && isControlFlowStatement(info.context)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {

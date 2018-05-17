@@ -1,5 +1,11 @@
 
 
+if (a) {
+  
+  a = 1;
+}
+
+
 class A {
     propA = 1;
     propB = arg => {
@@ -7,7 +13,6 @@ class A {
 
       z + 1;
     };
-
 
     constructor () {}
     methodA () {}

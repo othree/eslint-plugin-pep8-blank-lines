@@ -95,8 +95,12 @@ const walk = function (node, context, info) {
   }
 
   if (node.test) {
+    info.prev = findTokenBefore(node.test, context);
+    const currContext = info.context;
+    info.context = {type: 'ControlFlow'};
     walk(node.test, context, info);
     info.prev = node.test;
+    info.context = currContext;
   }
 
   if (node.update) {
@@ -113,13 +117,19 @@ const walk = function (node, context, info) {
   }
 
   if (node.consequent) {
+    const currContext = info.context;
+    info.context = node;
     walk(node.consequent, context, info);
     info.prev = node.consequent;
+    info.context = currContext;
   }
 
   if (node.alternate) {
+    const currContext = info.context;
+    info.context = node;
     walk(node.alternate, context, info);
     info.prev = node.alternate;
+    info.context = currContext;
   }
 
   if (node.params && node.params.length) {
