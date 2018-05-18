@@ -69,6 +69,8 @@ const walk = function (node, context, info) {
   // try: block > handler > finally
   // block: block
   // for: init > test > update > body
+  // forin: left > right > body
+  // forof: left > right > body
   // object: properties
   // array: elements
   // property: key > value
