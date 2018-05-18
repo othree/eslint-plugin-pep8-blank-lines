@@ -129,6 +129,7 @@ const walk = function (node, context, info) {
   if (node.alternate) {
     const currContext = info.context;
     info.context = node;
+    info.prev = findTokenBefore(node.alternate, context);
     walk(node.alternate, context, info);
     info.prev = node.alternate;
     info.context = currContext;
