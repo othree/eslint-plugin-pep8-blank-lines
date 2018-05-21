@@ -20,6 +20,15 @@ const BLOCK_EXPRESSIONS = [
   'ClassEexpression',
 ];
 
+const INLINE_EXPRESSIONS = [
+  'AssignmentExpression',
+  'UnaryExpression',
+  'BinaryExpression',
+  'ConditionalExpression',
+  'MemberExpression',
+  'CallExpression',
+];
+
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
 
 const CONTROL_FLOW_STATEMENTS = [
