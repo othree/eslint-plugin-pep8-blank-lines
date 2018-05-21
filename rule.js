@@ -147,6 +147,9 @@ const walk = function (node, context, info) {
   }
 
   if (node.body) {
+    const currContext = info.context;
+    info.context = node;
+
     if (node.type !== 'Program' && Array.isArray(node.body)) {
       console.log('{level +1}');
       info.level += 1;
@@ -170,22 +173,34 @@ const walk = function (node, context, info) {
       console.log('{level -1}');
       info.level -= 1;
     }
+
+    info.context = currContext;
   }
 
   if (node.properties && node.properties.length) {
+    const currContext = info.context;
+    info.context = node;
+
     info.prev = findTokenBefore(node.properties[0], context);
     for (const n of node.properties) {
       walk(n, context, info);
       info.prev = n;
     }
+
+    info.context = currContext;
   }
 
   if (node.elements && node.cases.length) {
+    const currContext = info.context;
+    info.context = node;
+
     info.prev = findTokenBefore(node.elements[0], context);
     for (const n of node.elements) {
       walk(n, context, info);
       info.prev = n;
     }
+
+    info.context = currContext;
   }
 
   if (node.property) {

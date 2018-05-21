@@ -105,6 +105,7 @@ const isInParen = info =>
   (info.context &&
     (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
 
+
 const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
 
@@ -115,8 +116,8 @@ exports.findTokenBefore = (node, context) => {
 
 
 exports.findFirstTokenBeforeBody = (node, context) => {
-  if (BLOCK_DECLARATIONS.includes(node.type) || BLOCK_EXPRESSIONS.includes(node.type)) {
-    return context.getTokenBefore(node.body);
+  if (node.body) {
+    return context.getTokenBefore(node.body[0] || node.body);
   }
   return null;
 };

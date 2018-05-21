@@ -1,24 +1,8 @@
 
 
-if (a) {
-  
+for (let a in arr) {
   a = 1;
+
+
+  a = 2;
 }
-
-
-class A {
-    propA = 1;
-    propB = arg => {
-      var z = arg;
-
-      z + 1;
-    };
-
-    constructor () {}
-    methodA () {}
-}
-
-
-class C {
-}
-
