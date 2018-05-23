@@ -1,8 +1,7 @@
 
 
-for (let a in arr) {
-  a = 1;
+var a = 1 +
+        // comment
 
+        2;
 
-  a = 2;
-}

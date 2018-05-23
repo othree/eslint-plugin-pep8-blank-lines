@@ -55,6 +55,13 @@ const FUNCTIONS = [
   'ArrowFunctionExpression',
 ];
 
+const EXPRESSIONS = [
+  'AssignmentExpression',
+  'BinaryExpression',
+  'UnaryExpression',
+  'CallExpression',
+];
+
 const COMMENTS = [
   'Block',
   'Line',
@@ -104,6 +111,10 @@ const isStatement = node =>
 
 const isDeclarator = node =>
   DECCLARATORS.includes(node.type);
+
+
+const isExpression = node =>
+  EXPRESSIONS.includes(node.type);
 
 
 const isComment = node =>
@@ -160,6 +171,8 @@ exports.ruleFor = (info) => {
   } else if (isInParen(info)) {
     rule = 'maxzero';
   } else if (info.context && isControlFlowStatement(info.context)) {
+    rule = 'maxzero';
+  } else if (info.context && isExpression(info.context)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {

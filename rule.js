@@ -215,6 +215,23 @@ const walk = function (node, context, info) {
     walk(node.value, context, info);
   }
 
+  if (node.operator) {
+    const currContext = info.context;
+    info.context = node;
+    const op = context.getTokenBefore(node.right);
+    // walk(op, context, info);
+    info.prev = op;
+    info.context = currContext;
+  }
+
+  if (node.right) {
+    const currContext = info.context;
+    info.context = node;
+    walk(node.right, context, info);
+    info.prev = node.right;
+    info.context = currContext;
+  }
+
   info.prev = node;
 };
 
