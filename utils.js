@@ -23,6 +23,7 @@ const BLOCK_EXPRESSIONS = [
 const INLINE_EXPRESSIONS = [
   'AssignmentExpression',
   'UnaryExpression',
+  'UpdateExpression',
   'BinaryExpression',
   'ConditionalExpression',
   'MemberExpression',
@@ -110,6 +111,10 @@ const isInline = node =>
   INLINE_EXPRESSIONS.includes(node.type);
 
 
+const isFor = node =>
+  node.type === 'ForStatement';
+
+
 const isComment = node =>
   COMMENTS.includes(node.type);
 
@@ -166,6 +171,8 @@ exports.ruleFor = (info) => {
   } else if (info.context && isControlFlowStatement(info.context)) {
     rule = 'maxzero';
   } else if (info.context && isInline(info.context)) {
+    rule = 'maxzero';
+  } else if (info.context && isFor(info.context)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {

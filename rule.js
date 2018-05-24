@@ -77,10 +77,12 @@ const walk = function (node, context, info) {
   // label: body
   // literal: value
   // exp: left > right
+  // unary exp: argument
   // cal exp: arguments
   // member exp: property
   //
-  // decorators > declarations > init > test > update > cases > consequent > alternate > params[] > body[] or body > properties > elements > property > value
+  //   decorators > declarations > init > test > update > cases > consequent > alternate > params[]
+  // > body[] or body > properties > elements > property > value > left > right > argument
 
   if (node.declarations && node.declarations.length) {
     info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
@@ -92,22 +94,29 @@ const walk = function (node, context, info) {
 
   if (node.init) {
     info.prev = findTokenBefore(node.init, context);
+    const currContext = info.context;
+    info.context = node;
     walk(node.init, context, info);
     info.prev = node.init;
+    info.context = currContext;
   }
 
   if (node.test) {
     info.prev = findTokenBefore(node.test, context);
     const currContext = info.context;
-    info.context = {type: 'ControlFlow'};
+    info.context = node;
     walk(node.test, context, info);
     info.prev = node.test;
     info.context = currContext;
   }
 
   if (node.update) {
+    info.prev = findTokenBefore(node.update, context);
+    const currContext = info.context;
+    info.context = node;
     walk(node.update, context, info);
     info.prev = node.update;
+    info.context = currContext;
   }
 
   if (node.cases && node.cases.length) {
@@ -241,7 +250,9 @@ const walk = function (node, context, info) {
   if (node.argument) {
     const currContext = info.context;
     info.context = node;
-    walk(node.argument, context, info);
+    if (node.prefix) {
+      walk(node.argument, context, info);
+    }
     info.prev = node.argument;
     info.context = currContext;
   }
