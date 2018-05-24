@@ -1,9 +1,10 @@
 
 
-for (const i = 0; i < 10; // comment
+try {
+  let a = 1;
+} /*comment*/
 
-  i++) {
-  a = i;
+catch (error) {
 }
 
 

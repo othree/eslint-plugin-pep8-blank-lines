@@ -82,6 +82,7 @@ const walk = function (node, context, info) {
   // member exp: property
   //
   //   decorators > declarations > init > test > update > cases > consequent > alternate > params[]
+  // > block > handler > finally
   // > body[] or body > properties > elements > property > value > left > right > argument
 
   if (node.declarations && node.declarations.length) {
@@ -141,6 +142,33 @@ const walk = function (node, context, info) {
     info.prev = findTokenBefore(node.alternate, context);
     walk(node.alternate, context, info);
     info.prev = node.alternate;
+    info.context = currContext;
+  }
+
+  if (node.block) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = findTokenBefore(node.block, context);
+    walk(node.block, context, info);
+    info.prev = node.block;
+    info.context = currContext;
+  }
+
+  if (node.handler) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = findTokenBefore(node.handler, context);
+    walk(node.handler, context, info);
+    info.prev = node.handler;
+    info.context = currContext;
+  }
+
+  if (node.finalizer) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = findTokenBefore(node.finalizer, context);
+    walk(node.finalizer, context, info);
+    info.prev = node.finalizer;
     info.context = currContext;
   }
 

@@ -11,6 +11,7 @@ const EXPORTS = [
 const BLOCK_DECLARATIONS = [
   'FunctionDeclaration',
   'ClassDeclaration',
+  'CatchClause',
 ];
 
 const BLOCK_DECLARATION_STARTS = BLOCK_DECLARATIONS.map(name => `${name}Start`);
@@ -40,6 +41,7 @@ const CONTROL_FLOW_STATEMENTS = [
   'ForOfStatement',
   'WhileStatement',
   'TryStatement',
+  'CatchClause',
 ];
 
 const DECLARATIONS = [
