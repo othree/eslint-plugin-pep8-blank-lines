@@ -1,7 +1,6 @@
 
 
-var a = 1 +
-        // comment
-
-        2;
+var a = -/* comment */
+        
+        1;
 
