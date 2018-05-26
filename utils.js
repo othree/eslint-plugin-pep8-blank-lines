@@ -36,6 +36,7 @@ const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
 const CONTROL_FLOW_STATEMENTS = [
   'IfStatement',
   'SwitchStatement',
+  'SwitchCase',
   'ForStatement',
   'ForInStatement',
   'ForOfStatement',

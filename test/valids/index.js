@@ -1,9 +1,13 @@
 
 
-try {
-  let a = 1;
-} /*comment*/
-catch (error) {
+switch (a) {
+  case 1:
+    b = 1;
+  case  // comment
+    2:
+    b = 2;
+  default:
+    b = 3;
 }
 
 

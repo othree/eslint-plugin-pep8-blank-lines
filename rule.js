@@ -122,10 +122,13 @@ const walk = function (node, context, info) {
 
   if (node.cases && node.cases.length) {
     info.prev = findTokenBefore(node.cases[0], context);
+    const currContext = info.context;
+    info.context = node;
     for (const n of node.cases) {
       walk(n, context, info);
       info.prev = n;
     }
+    info.context = currContext;
   }
 
   if (node.consequent) {
