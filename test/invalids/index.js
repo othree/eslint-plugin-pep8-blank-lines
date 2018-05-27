@@ -1,14 +1,7 @@
 
 
-switch (a) {
-  case 1:
-    b = 1;
-  case  // comment
+new
 
-    2:
-    b = 2;
-  default:
-    b = 3;
-}
+/* comment */XD();
 
 

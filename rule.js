@@ -11,6 +11,8 @@ const blockStartNode = UTILS.blockStartNode;
 const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
 
+const isNew = UTILS.isNew;
+
 
 const linesBetween = (top, bottom, rule, callback) =>
   callback(rule(top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
@@ -50,8 +52,12 @@ const walk = function (node, context, info) {
 
   if (node.type !== 'Program') {
     const comments = context.getCommentsBefore(node);
+    const nodes = [...comments, node];
+    if (info.prev) {
+      nodes.unshift(info.prev);
+    }
 
-    recursiveLinesBetween([info.prev, ...comments, node], info, (ok, n, args) => {
+    recursiveLinesBetween(nodes, info, (ok, n, args) => {
       if (!ok) { console.log('[report][prev]', args[0]); }
       if (!ok) { console.log('[report][curr]', args[1]); }
       if (!ok) { context.report(node, 'invalid'); }
@@ -78,12 +84,14 @@ const walk = function (node, context, info) {
   // literal: value
   // exp: left > right
   // unary exp: argument
-  // cal exp: arguments
+  // cal exp: callee > arguments
   // member exp: property
+  // exp: expression
   //
   //   decorators > declarations > init > test > update > cases > consequent > alternate > params[]
   // > block > handler > finally
   // > body[] or body > properties > elements > property > value > left > right > argument
+  // > expression
 
   if (node.declarations && node.declarations.length) {
     info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
@@ -278,6 +286,17 @@ const walk = function (node, context, info) {
     info.context = currContext;
   }
 
+  if (node.callee) {
+    const op = context.getTokenBefore(node.callee);
+    if (isNew(op)) {
+      const currContext = info.context;
+      info.context = node;
+      info.prev = op;
+      walk(node.callee, context, info);
+      info.context = currContext;
+    }
+  }
+
   if (node.argument) {
     const currContext = info.context;
     info.context = node;
@@ -285,6 +304,15 @@ const walk = function (node, context, info) {
       walk(node.argument, context, info);
     }
     info.prev = node.argument;
+    info.context = currContext;
+  }
+
+  if (node.expression) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = null;
+    walk(node.expression, context, info);
+    info.prev = node.expression;
     info.context = currContext;
   }
 

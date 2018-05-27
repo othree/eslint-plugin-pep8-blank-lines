@@ -29,6 +29,7 @@ const INLINE_EXPRESSIONS = [
   'ConditionalExpression',
   'MemberExpression',
   'CallExpression',
+  'NewExpression',
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
@@ -131,6 +132,10 @@ const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
 
 
+const isNew = token =>
+  (token.type === 'Keyword' && token.value === 'new');
+
+
 exports.findTokenBefore = (node, context) => {
   return context.getTokenBefore(node);
 };
@@ -220,3 +225,6 @@ exports.pretendStart = (node, token) => {
   }
   return null;
 };
+
+
+exports.isNew = isNew;
