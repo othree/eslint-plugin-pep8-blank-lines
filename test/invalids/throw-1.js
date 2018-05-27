@@ -1,0 +1,7 @@
+
+
+throw new /* comment */
+
+XD();
+
+
