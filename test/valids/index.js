@@ -1,6 +1,6 @@
 
 
-new /* comment */XD();
+throw /* comment */ new XD();
 
 
 class A {

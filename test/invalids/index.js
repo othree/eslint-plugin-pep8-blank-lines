@@ -1,7 +1,7 @@
 
 
-new
+throw new /* comment */
 
-/* comment */XD();
+XD();
 
 

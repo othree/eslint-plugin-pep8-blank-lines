@@ -300,9 +300,8 @@ const walk = function (node, context, info) {
   if (node.argument) {
     const currContext = info.context;
     info.context = node;
-    if (node.prefix) {
-      walk(node.argument, context, info);
-    }
+    info.prev = context.getTokenBefore(node.argument);
+    walk(node.argument, context, info);
     info.prev = node.argument;
     info.context = currContext;
   }

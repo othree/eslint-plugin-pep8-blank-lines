@@ -46,6 +46,10 @@ const CONTROL_FLOW_STATEMENTS = [
   'CatchClause',
 ];
 
+const THROW_STATEMENT = [
+  'ThrowStatement',
+];
+
 const DECLARATIONS = [
   'VariableDeclaration',
 ];
@@ -136,6 +140,10 @@ const isNew = token =>
   (token.type === 'Keyword' && token.value === 'new');
 
 
+const isThrow = node =>
+  THROW_STATEMENT.includes(node.type);
+
+
 exports.findTokenBefore = (node, context) => {
   return context.getTokenBefore(node);
 };
@@ -181,6 +189,8 @@ exports.ruleFor = (info) => {
   } else if (info.context && isInline(info.context)) {
     rule = 'maxzero';
   } else if (info.context && isFor(info.context)) {
+    rule = 'maxzero';
+  } else if (info.context && isThrow(info.context)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
     if (isBlock(info.prev)) {
