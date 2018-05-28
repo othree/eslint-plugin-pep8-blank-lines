@@ -16,6 +16,10 @@ const BLOCK_DECLARATIONS = [
 
 const BLOCK_DECLARATION_STARTS = BLOCK_DECLARATIONS.map(name => `${name}Start`);
 
+const META_EXPRESSION = [
+  'SequenceExpression',
+]
+
 const BLOCK_EXPRESSIONS = [
   'FunctionExpression',
   'ClassEexpression',
@@ -127,6 +131,9 @@ const isComment = node =>
   COMMENTS.includes(node.type);
 
 
+const isInExpression = node =>
+  node.context && META_EXPRESSION.includes(node.context.type);
+
 const isInParen = info =>
   (info.context &&
     (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
@@ -183,6 +190,8 @@ exports.ruleFor = (info) => {
   } else if (isAssign(info.prev)) {
     rule = 'maxzero';
   } else if (isInParen(info)) {
+    rule = 'maxzero';
+  } else if (isInExpression(info)) {
     rule = 'maxzero';
   } else if (info.context && isControlFlowStatement(info.context)) {
     rule = 'maxzero';

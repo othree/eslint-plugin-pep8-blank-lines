@@ -1,6 +1,7 @@
 
 
-throw /* comment */ new XD();
+a = 1 /* comment */
+  , b = 2;
 
 
 class A {

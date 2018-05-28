@@ -87,11 +87,12 @@ const walk = function (node, context, info) {
   // cal exp: callee > arguments
   // member exp: property
   // exp: expression
+  // exps: expressions
   //
   //   decorators > declarations > init > test > update > cases > consequent > alternate > params[]
   // > block > handler > finally
   // > body[] or body > properties > elements > property > value > left > right > argument
-  // > expression
+  // > expression > expressions
 
   if (node.declarations && node.declarations.length) {
     info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
@@ -312,6 +313,22 @@ const walk = function (node, context, info) {
     info.prev = null;
     walk(node.expression, context, info);
     info.prev = node.expression;
+    info.context = currContext;
+  }
+
+  if (node.expressions) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = null;
+    for (const n of node.expressions) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        walk(comma, context, info);
+        info.prev = comma;
+      }
+      walk(n, context, info);
+      info.prev = n;
+    }
     info.context = currContext;
   }
 

@@ -1,7 +1,8 @@
 
 
-throw new /* comment */
-
-XD();
+a = 1 /* comment */
+  , /* comment */
+ 
+  b = 2;
 
 
