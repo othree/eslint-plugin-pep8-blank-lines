@@ -298,7 +298,7 @@ const walk = function (node, context, info) {
     }
   }
 
-  if (node.argument) {
+  if (node.argument && !(node.operator && !node.prefix)) {
     const currContext = info.context;
     info.context = node;
     info.prev = context.getTokenBefore(node.argument);
