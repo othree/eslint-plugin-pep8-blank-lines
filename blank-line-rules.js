@@ -16,5 +16,3 @@ module.exports = {
     return delta === 1 || delta === 3;
   },
 };
-
-
