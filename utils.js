@@ -202,7 +202,7 @@ exports.ruleFor = (info) => {
   } else if (info.context && isThrow(info.context)) {
     rule = 'maxzero';
   } else if (info.level === 0) {
-    if (isBlock(info.prev)) {
+    if (isBlock(info.prev) || isBlock(info.current)) {
       rule = 'two';
     } else if (isImport(info.prev) && isImport(info.current)) {
       rule = 'maxtwo';
@@ -214,6 +214,8 @@ exports.ruleFor = (info) => {
       rule = 'maxone';
     } else if (isDeclarator(info.current)) {
       rule = 'maxzero';
+    } else if ((isStatement(info.prev) && isComment(info.current)) || (isComment(info.prev) && isStatement(info.current))) {
+      rule = 'maxtwo';
     } else {
       rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
     }
