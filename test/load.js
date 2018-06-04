@@ -8,3 +8,5 @@ exports.readfile = readfile;
 exports.prefixdir = prefixdir;
 
 exports.readdir = pathname => fs.readdirSync(pathname);
+
+exports.readmsgkey = filename => readfile(filename).split(/\s+/g)[1];
