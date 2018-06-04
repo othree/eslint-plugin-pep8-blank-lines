@@ -3,6 +3,7 @@
 const RULES = require('./blank-line-rules');
 const UTILS = require('./utils');
 
+const messages = require('./messages.js');
 
 const findTokenBefore = UTILS.findTokenBefore;
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
@@ -15,7 +16,7 @@ const isNew = UTILS.isNew;
 
 
 const linesBetween = (top, bottom, rule, callback) =>
-  callback(rule(top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
+  callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
 
 
 /**
@@ -30,8 +31,7 @@ const recursiveLinesBetween = (nodes, info, callback) => {
   for (let i = 0; i < nodes.length; i += 1) {
     const bottom = nodes[i];
     info.current = bottom;
-    console.log(ruleFor(info));
-    linesBetween(top, bottom, RULES[ruleFor(info)], callback);
+    linesBetween(top, bottom, ruleFor(info), callback);
     top = bottom;
     info.prev = top;
   }
@@ -51,17 +51,24 @@ const walk = function (node, context, info) {
   }
 
   if (node.type !== 'Program') {
-    const comments = context.getCommentsBefore(node);
-    const nodes = [...comments, node];
+    /**
+     * Some structure didn't send info.prev
+     * Don't check blank line to avoid double check
+     * ex: SequenceExpression
+     */
     if (info.prev) {
+      const comments = context.getCommentsBefore(node);
+      const nodes = [...comments, node];
       nodes.unshift(info.prev);
-    }
 
-    recursiveLinesBetween(nodes, info, (ok, n, args) => {
-      if (!ok) { console.log('[report][prev]', args[0]); }
-      if (!ok) { console.log('[report][curr]', args[1]); }
-      if (!ok) { context.report(node, 'invalid'); }
-    });
+      recursiveLinesBetween(nodes, info, (ok, n, [top, bottom, rule, callback]) => {
+        // if (!ok) { console.log('[report][rule]', rule); }
+        // if (!ok) { console.log('[report][prev]', top); }
+        // if (!ok) { console.log('[report][curr]', bottom); }
+        if (!ok) { console.log('[report][msg]', messages[rule]); }
+        if (!ok) { context.report(node, messages[rule]); }
+      });
+    }
   }
 
   // props by order
@@ -200,7 +207,7 @@ const walk = function (node, context, info) {
     info.context = node;
 
     if (node.type !== 'Program' && Array.isArray(node.body)) {
-      console.log('{level +1}');
+      // console.log('{level +1}');
       info.level += 1;
       info.prev = blockStartNode(cursorLine);
     } else {
@@ -209,17 +216,13 @@ const walk = function (node, context, info) {
 
     const body = Array.isArray(node.body) ? node.body : [node.body];
 
-    console.log(`start body ${node.type}-${info.level}`);
     for (const n of body) {
-      // console.log('[info]', info.prev.type);
-      // console.log('[n]', n);
       walk(n, context, info);
       info.prev = n;
     }
-    console.log(`end body ${node.type}-${info.level}`);
 
     if (node.type !== 'Program' && Array.isArray(node.body)) {
-      console.log('{level -1}');
+      // console.log('{level -1}');
       info.level -= 1;
     }
 
