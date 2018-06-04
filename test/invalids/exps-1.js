@@ -1,3 +1,4 @@
+// zero
 
 
 a = 1 /* comment */
