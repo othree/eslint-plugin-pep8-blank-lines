@@ -34,6 +34,7 @@ const INLINE_EXPRESSIONS = [
   'MemberExpression',
   'CallExpression',
   'NewExpression',
+  'AssignmentPattern',
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);

@@ -271,7 +271,7 @@ const walk = function (node, context, info) {
     info.prev = node.left;
   }
 
-  if (node.operator) {
+  if (node.operator || (node.left && node.right)) {
     const currContext = info.context;
     info.context = node;
     const op = context.getTokenBefore(node.right || node.argument);
