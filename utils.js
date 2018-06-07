@@ -68,6 +68,10 @@ const FUNCTIONS = [
   'ArrowFunctionExpression',
 ];
 
+const CLASS_METHODS = [
+  'MethodDefinition'
+];
+
 const COMMENTS = [
   'Block',
   'Line',
@@ -125,6 +129,10 @@ const isInline = node =>
 
 const isFor = node =>
   node.type === 'ForStatement';
+
+
+const isClassMethod = node =>
+  CLASS_METHODS.includes(node.type);
 
 
 const isComment = node =>
@@ -201,6 +209,8 @@ exports.ruleFor = (info) => {
     rule = 'maxzero';
   } else if (info.context && isThrow(info.context)) {
     rule = 'maxzero';
+  } else if (info.prev && isClassMethod(info.prev) && isClassMethod(info.current)) {
+    rule = 'one';
   } else if (info.level === 0) {
     if (isBlock(info.prev) || isBlock(info.current)) {
       rule = 'two';
