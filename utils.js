@@ -25,6 +25,10 @@ const BLOCK_EXPRESSIONS = [
   'ClassEexpression',
 ];
 
+const ARRAY = [
+  'ArrayExpression',
+];
+
 const INLINE_EXPRESSIONS = [
   'AssignmentExpression',
   'UnaryExpression',
@@ -124,6 +128,10 @@ const isDeclarator = node =>
   DECCLARATORS.includes(node.type);
 
 
+const isArray = node =>
+  ARRAY.includes(node.type);
+
+
 const isInline = node =>
   INLINE_EXPRESSIONS.includes(node.type);
 
@@ -206,6 +214,8 @@ exports.ruleFor = (info) => {
     rule = 'maxzero';
   } else if (info.context && isInline(info.context)) {
     rule = 'maxzero';
+  } else if (info.context && isArray(info.context)) {
+    rule = 'maxone';
   } else if (info.context && isFor(info.context)) {
     rule = 'maxzero';
   } else if (info.context && isThrow(info.context)) {

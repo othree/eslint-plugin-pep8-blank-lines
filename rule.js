@@ -242,7 +242,7 @@ const walk = function (node, context, info) {
     info.context = currContext;
   }
 
-  if (node.elements && node.cases.length) {
+  if (node.elements && node.elements.length) {
     const currContext = info.context;
     info.context = node;
 
