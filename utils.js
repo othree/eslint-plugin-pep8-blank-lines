@@ -29,6 +29,10 @@ const ARRAY = [
   'ArrayExpression',
 ];
 
+const OBJECT = [
+  'ObjectExpression',
+];
+
 const INLINE_EXPRESSIONS = [
   'AssignmentExpression',
   'UnaryExpression',
@@ -132,6 +136,10 @@ const isArray = node =>
   ARRAY.includes(node.type);
 
 
+const isObject = node =>
+  OBJECT.includes(node.type);
+
+
 const isInline = node =>
   INLINE_EXPRESSIONS.includes(node.type);
 
@@ -215,6 +223,8 @@ exports.ruleFor = (info) => {
   } else if (info.context && isInline(info.context)) {
     rule = 'maxzero';
   } else if (info.context && isArray(info.context)) {
+    rule = 'maxone';
+  } else if (info.context && isObject(info.context)) {
     rule = 'maxone';
   } else if (info.context && isFor(info.context)) {
     rule = 'maxzero';
