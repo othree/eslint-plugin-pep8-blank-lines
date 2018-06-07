@@ -168,6 +168,10 @@ const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
 
 
+const isComma = token =>
+  (token.type === 'Punctuator' && token.value === ',');
+
+
 const isNew = token =>
   (token.type === 'Keyword' && token.value === 'new');
 
@@ -280,3 +284,4 @@ exports.pretendStart = (node, token) => {
 
 
 exports.isNew = isNew;
+exports.isComma = isComma;

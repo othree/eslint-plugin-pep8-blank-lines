@@ -13,6 +13,7 @@ const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
 
 const isNew = UTILS.isNew;
+const isComma = UTILS.isComma;
 
 
 const linesBetween = (top, bottom, rule, callback) =>
@@ -235,6 +236,13 @@ const walk = function (node, context, info) {
 
     info.prev = findTokenBefore(node.properties[0], context);
     for (const n of node.properties) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        if (isComma(comma)) {
+          walk(comma, context, info);
+          info.prev = comma;
+        }
+      }
       walk(n, context, info);
       info.prev = n;
     }
@@ -248,6 +256,13 @@ const walk = function (node, context, info) {
 
     info.prev = findTokenBefore(node.elements[0], context);
     for (const n of node.elements) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        if (isComma(comma)) {
+          walk(comma, context, info);
+          info.prev = comma;
+        }
+      }
       walk(n, context, info);
       info.prev = n;
     }
