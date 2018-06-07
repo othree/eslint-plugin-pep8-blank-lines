@@ -2,6 +2,7 @@
 
 class A {
     constructor () {}
+
     methodA () {}
 }
 

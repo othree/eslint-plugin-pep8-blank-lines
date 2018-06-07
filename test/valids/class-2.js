@@ -13,6 +13,7 @@ class A {
     };
 
     constructor () {}
+
     methodA () {}
 }
 
