@@ -33,6 +33,11 @@ const OBJECT = [
   'ObjectExpression',
 ];
 
+const PROPERTY_KEY = [
+  'MethodDefinition',
+  'Property',
+]
+
 const INLINE_EXPRESSIONS = [
   'AssignmentExpression',
   'UnaryExpression',
@@ -140,6 +145,10 @@ const isObject = node =>
   OBJECT.includes(node.type);
 
 
+const isPropertyKey = node =>
+  PROPERTY_KEY.includes(node.type);
+
+
 const isInline = node =>
   INLINE_EXPRESSIONS.includes(node.type);
 
@@ -173,7 +182,7 @@ const isComma = token =>
 
 
 const isNew = token =>
-  (token.type === 'Keyword' && token.value === 'new');
+  (token && token.type === 'Keyword' && token.value === 'new');
 
 
 const isThrow = node =>
@@ -228,6 +237,8 @@ exports.ruleFor = (info) => {
     rule = 'maxzero';
   } else if (info.context && isArray(info.context)) {
     rule = 'maxone';
+  } else if (info.context && isPropertyKey(info.context)) {
+    rule = 'maxzero';
   } else if (info.context && isObject(info.context)) {
     rule = 'maxone';
   } else if (info.context && isFor(info.context)) {

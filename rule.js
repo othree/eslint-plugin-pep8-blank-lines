@@ -93,13 +93,13 @@ const walk = function (node, context, info) {
   // exp: left > right
   // unary exp: argument
   // cal exp: callee > arguments
-  // member exp: property
+  // object prop exp: key
   // exp: expression
   // exps: expressions
   //
   //   decorators > declarations > init > test > update > cases > consequent > alternate > params[]
   // > block > handler > finally
-  // > body[] or body > properties > elements > property > value > left > right > argument
+  // > body[] or body > properties > elements > key > value > left > right > argument
   // > expression > expressions
 
   if (node.declarations && node.declarations.length) {
@@ -275,6 +275,19 @@ const walk = function (node, context, info) {
     info.prev = node.property;
   }
 
+  if (node.key) {
+    if (node.computed) {
+      info.prev = context.getTokenBefore(node.key);
+    } else {
+      info.prev = null;
+    }
+    const currContext = info.context;
+    info.context = node;
+    walk(node.key, context, info);
+    info.prev = node.key;
+    info.context = currContext;
+  }
+
   if (node.value && node.value.type) {
     if (node.type === 'ClassProperty') {
       info.prev = context.getTokenAfter(node.key);
@@ -313,6 +326,8 @@ const walk = function (node, context, info) {
       info.prev = op;
       walk(node.callee, context, info);
       info.context = currContext;
+    } else {
+      walk(node.callee, context, info);
     }
   }
 
