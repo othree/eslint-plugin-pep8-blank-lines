@@ -66,7 +66,7 @@ const walk = function (node, context, info) {
         // if (!ok) { console.log('[report][rule]', rule); }
         // if (!ok) { console.log('[report][prev]', top); }
         // if (!ok) { console.log('[report][curr]', bottom); }
-        if (!ok) { console.log('[report][msg]', messages[rule]); }
+        // if (!ok) { console.log('[report][msg]', messages[rule]); }
         if (!ok) { context.report(node, messages[rule]); }
       });
     }

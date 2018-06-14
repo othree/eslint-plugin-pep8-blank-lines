@@ -31,7 +31,7 @@ ruleTester.run('pep8-blank-lines', rule, {
   invalid: invalids.map(filename => { 
     const msgkey = readmsgkey(filename);
     const msg = messages[msgkey] || 'Unspecified Invalid';
-    console.log('[expect][msg]', msg);
+    // console.log('[expect][msg]', msg);
     return {
       code: readfile(filename),
       errors: [{ message: msg }],
