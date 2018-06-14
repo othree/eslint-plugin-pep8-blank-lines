@@ -1,4 +1,7 @@
 
+const ASTUTILS = require('eslint/lib/ast-utils');
+
+
 const IMPORTS = [
   'ImportDeclaration',
 ];
@@ -173,6 +176,10 @@ const isInParen = info =>
     (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
 
 
+const isArrow = token =>
+  (token.type === 'Punctuator' && token.value === '=>');
+
+
 const isAssign = token =>
   (token.type === 'Punctuator' && token.value === '=');
 
@@ -187,6 +194,52 @@ const isNew = token =>
 
 const isThrow = node =>
   THROW_STATEMENT.includes(node.type);
+
+
+const isParenthesised = (context, node) => {
+  if (Array.isArray(node)) {
+    if (node.length > 1) {
+      return true;
+    }
+
+    const previousToken = context.getTokenBefore(node[0]);
+    const nextToken = context.getTokenAfter(node[node.length - 1]);
+
+    return Boolean(previousToken && nextToken) &&
+        previousToken.value === "(" && previousToken.range[1] <= node.range[0] &&
+        nextToken.value === ")" && nextToken.range[0] >= node.range[1];
+  } else {
+    return ASTUTILS.isParenthesised(context, node);
+  }
+};
+
+
+exports.findParamsLoc = (context, node) => {
+  let loc = null;
+  if (node.params) {
+    loc = {};
+    let right = null;
+    let left = null;
+
+    if (node.params.length) {
+      if (isParenthesised(context, node.params)) {
+        left = context.getTokenBefore(node.params[0]);
+        right = context.getTokenAfter(node.params[node.params.length - 1]);
+      } else {
+        left = right = node.params[0];
+      }
+    } else if (node.params) {
+      right = context.getTokenBefore(node.body);
+      if (isArrow(right)) {
+        right = context.getTokenBefore(right);
+      }
+      left = context.getTokenBefore(right);
+    }
+    loc.end = right.loc.end;
+    loc.start = left.loc.start;
+  }
+  return loc;
+};
 
 
 exports.findTokenBefore = (node, context) => {
@@ -293,6 +346,7 @@ exports.pretendStart = (node, token) => {
   return null;
 };
 
+exports.isParenthesised = isParenthesised;
 
 exports.isNew = isNew;
 exports.isComma = isComma;
