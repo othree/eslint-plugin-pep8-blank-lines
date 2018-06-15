@@ -15,6 +15,8 @@ const pretendStart = UTILS.pretendStart;
 const isNew = UTILS.isNew;
 const isComma = UTILS.isComma;
 
+const findParamsLoc = UTILS.findParamsLoc;
+
 
 const linesBetween = (top, bottom, rule, callback) =>
   callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
@@ -41,6 +43,15 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 };
 
 
+const checkCallback = context => (ok, n, [top, bottom, rule, callback]) => {
+  // if (!ok) { console.log('[report][rule]', rule); }
+  // if (!ok) { console.log('[report][prev]', top); }
+  // if (!ok) { console.log('[report][curr]', bottom); }
+  // if (!ok) { console.log('[report][msg]', messages[rule]); }
+  if (!ok) { context.report(bottom, messages[rule]); }
+};
+
+
 const walk = function (node, context, info) {
   if (!node.type) {
     return;
@@ -62,13 +73,7 @@ const walk = function (node, context, info) {
       const nodes = [...comments, node];
       nodes.unshift(info.prev);
 
-      recursiveLinesBetween(nodes, info, (ok, n, [top, bottom, rule, callback]) => {
-        // if (!ok) { console.log('[report][rule]', rule); }
-        // if (!ok) { console.log('[report][prev]', top); }
-        // if (!ok) { console.log('[report][curr]', bottom); }
-        // if (!ok) { console.log('[report][msg]', messages[rule]); }
-        if (!ok) { context.report(node, messages[rule]); }
-      });
+      recursiveLinesBetween(nodes, info, checkCallback(context));
     }
   }
 
@@ -189,6 +194,22 @@ const walk = function (node, context, info) {
     info.prev = findTokenBefore(node.finalizer, context);
     walk(node.finalizer, context, info);
     info.prev = node.finalizer;
+    info.context = currContext;
+  }
+
+  // Check function defination, everything before body
+  if (node.params) {
+    const nodes = [];
+    const params = findParamsLoc(context, node);
+    if (node.type === 'ArrowFunctionExpression') {
+      if (node.async) {
+        nodes.push(context.getTokenBefore(params));
+      }
+      nodes.push(params)
+    }
+    const currContext = info.context;
+    info.context = node;
+    recursiveLinesBetween(nodes, info, checkCallback(context));
     info.context = currContext;
   }
 

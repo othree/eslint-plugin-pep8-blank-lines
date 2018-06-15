@@ -15,6 +15,7 @@ const BLOCK_DECLARATIONS = [
   'FunctionDeclaration',
   'ClassDeclaration',
   'CatchClause',
+  'ArrowFunctionExpression',
 ];
 
 const BLOCK_DECLARATION_STARTS = BLOCK_DECLARATIONS.map(name => `${name}Start`);
@@ -171,6 +172,11 @@ const isComment = node =>
 const isInExpression = node =>
   node.context && META_EXPRESSION.includes(node.context.type);
 
+
+const isInFunction = node =>
+  node.context && FUNCTIONS.includes(node.context.type);
+
+
 const isInParen = info =>
   (info.context &&
     (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
@@ -215,9 +221,13 @@ const isParenthesised = (context, node) => {
 
 
 exports.findParamsLoc = (context, node) => {
+  let n = null;
   let loc = null;
+  let range = null;
   if (node.params) {
     loc = {};
+    range = [];
+    // loc
     let right = null;
     let left = null;
 
@@ -237,8 +247,11 @@ exports.findParamsLoc = (context, node) => {
     }
     loc.end = right.loc.end;
     loc.start = left.loc.start;
+    range.push(left.range[0]);
+    range.push(right.range[1]);
+    n = {loc, range};
   }
-  return loc;
+  return n;
 };
 
 
@@ -283,6 +296,8 @@ exports.ruleFor = (info) => {
   } else if (isInParen(info)) {
     rule = 'maxzero';
   } else if (isInExpression(info)) {
+    rule = 'maxzero';
+  } else if (isInFunction(info)) {
     rule = 'maxzero';
   } else if (info.context && isControlFlowStatement(info.context)) {
     rule = 'maxzero';
