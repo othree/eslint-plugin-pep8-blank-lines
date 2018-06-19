@@ -1,7 +1,9 @@
+// zero
 
 
 function 
-name 
+fname 
+
 // comment
 () {
   let a = 2;
