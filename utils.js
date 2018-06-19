@@ -363,5 +363,23 @@ exports.pretendStart = (node, token) => {
 
 exports.isParenthesised = isParenthesised;
 
+exports.nodeAndComments = (nodes, context, firstComments = true) => {
+  const allnodes = [];
+
+  for (let i = 0; i < nodes.length; i++) {
+    const n = nodes[i];
+
+    if (i === 0 && !firstComments) { 
+      allnodes.push(n);
+      continue;
+    }
+
+    allnodes.push(...context.getCommentsBefore(n));
+    allnodes.push(n);
+  }
+  
+  return allnodes;
+};
+
 exports.isNew = isNew;
 exports.isComma = isComma;

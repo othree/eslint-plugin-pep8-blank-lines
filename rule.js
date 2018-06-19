@@ -12,6 +12,8 @@ const blockStartNode = UTILS.blockStartNode;
 const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
 
+const nodeAndComments = UTILS.nodeAndComments;
+
 const isNew = UTILS.isNew;
 const isComma = UTILS.isComma;
 
@@ -202,14 +204,26 @@ const walk = function (node, context, info) {
     const nodes = [];
     const params = findParamsLoc(context, node);
     if (node.type === 'ArrowFunctionExpression') {
-      if (node.async) {
-        nodes.push(context.getTokenBefore(params));
-      }
       nodes.push(params)
+      if (node.async) {
+        nodes.unshift(context.getTokenBefore(params));
+      }
+    } else { // Function expression, Method definition
+      nodes.unshift(params)
+      if (node.generator) {
+        nodes.unshift(context.getTokenBefore(nodes[0]));
+      }
+      if (node.id) {
+        nodes.unshift(context.getTokenBefore(nodes[0]));
+      }
+      nodes.unshift(context.getTokenBefore(nodes[0]));
+      if (node.async) {
+        nodes.unshift(context.getTokenBefore(nodes[0]));
+      }
     }
     const currContext = info.context;
     info.context = node;
-    recursiveLinesBetween(nodes, info, checkCallback(context));
+    recursiveLinesBetween(nodeAndComments(nodes, context, false), info, checkCallback(context));
     info.context = currContext;
   }
 
