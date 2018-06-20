@@ -20,14 +20,16 @@ const isComma = UTILS.isComma;
 const findParamsLoc = UTILS.findParamsLoc;
 
 
-const linesBetween = (top, bottom, rule, callback) =>
+const linesBetween = (top, bottom, rule, callback, debug) => {
+  if (debug) { console.log('[top-bottom]', top, bottom); }
   callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
+}
 
 
 /**
  * @description Lookup empty lines from top to bottom
  */
-const recursiveLinesBetween = (nodes, info, callback) => {
+const recursiveLinesBetween = (nodes, info, callback, debug) => {
   if (nodes.length === 0) { return null; }
   if (nodes.length === 1) { return nodes[0]; }
 
@@ -35,8 +37,9 @@ const recursiveLinesBetween = (nodes, info, callback) => {
 
   for (let i = 0; i < nodes.length; i += 1) {
     const bottom = nodes[i];
+    // if (debug) { console.log('[top-bottom]', top, bottom); }
     info.current = bottom;
-    linesBetween(top, bottom, ruleFor(info), callback);
+    linesBetween(top, bottom, ruleFor(info), callback, debug);
     top = bottom;
     info.prev = top;
   }
@@ -54,7 +57,7 @@ const checkCallback = context => (ok, n, [top, bottom, rule, callback]) => {
 };
 
 
-const walk = function (node, context, info) {
+const walk = function (node, context, info, debug) {
   if (!node.type) {
     return;
   }
@@ -75,7 +78,8 @@ const walk = function (node, context, info) {
       const nodes = [...comments, node];
       nodes.unshift(info.prev);
 
-      recursiveLinesBetween(nodes, info, checkCallback(context));
+      if (debug) { console.log(nodes); }
+      recursiveLinesBetween(nodes, info, checkCallback(context), debug);
     }
   }
 
