@@ -52,6 +52,7 @@ const INLINE_EXPRESSIONS = [
   'CallExpression',
   'NewExpression',
   'AssignmentPattern',
+  'AwaitExpression',
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
@@ -84,6 +85,10 @@ const FUNCTIONS = [
   'FunctionDeclaration',
   'FunctionExpression',
   'ArrowFunctionExpression',
+];
+
+const CALLS = [
+  'CallExpression',
 ];
 
 const CLASS_METHODS = [
@@ -179,7 +184,7 @@ const isInFunction = node =>
 
 const isInParen = info =>
   (info.context &&
-    (info.context.type === 'FunctionParams' || info.context.type === 'ControlFlow'));
+    (['FunctionParams', 'CallArguments'].includes(info.context.type) || info.context.type === 'ControlFlow'));
 
 
 const isArrow = token =>
@@ -271,6 +276,14 @@ exports.findFirstTokenBeforeBody = (node, context) => {
 exports.findFirstTokenBeforeParams = (node, context) => {
   if (FUNCTIONS.includes(node.type) && node.params[0]) {
     return context.getTokenBefore(node.params[0]);
+  }
+  return null;
+};
+
+
+exports.findFirstTokenBeforeArguments = (node, context) => {
+  if (CALLS.includes(node.type) && node.arguments[0]) {
+    return context.getTokenBefore(node.arguments[0]);
   }
   return null;
 };

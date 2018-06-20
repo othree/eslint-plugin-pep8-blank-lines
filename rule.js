@@ -8,6 +8,7 @@ const messages = require('./messages.js');
 const findTokenBefore = UTILS.findTokenBefore;
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
 const findFirstTokenBeforeParams = UTILS.findFirstTokenBeforeParams;
+const findFirstTokenBeforeArguments = UTILS.findFirstTokenBeforeArguments;
 const blockStartNode = UTILS.blockStartNode;
 const ruleFor = UTILS.ruleFor;
 const pretendStart = UTILS.pretendStart;
@@ -366,6 +367,7 @@ const walk = function (node, context, info, debug) {
       walk(node.callee, context, info);
       info.context = currContext;
     } else {
+      info.prev = null;
       walk(node.callee, context, info);
     }
   }
@@ -376,6 +378,22 @@ const walk = function (node, context, info, debug) {
     info.prev = context.getTokenBefore(node.argument);
     walk(node.argument, context, info);
     info.prev = node.argument;
+    info.context = currContext;
+  }
+
+  if (node.arguments && node.arguments.length) {
+    const currContext = info.context;
+    info.context = {type: 'CallArguments'};
+    info.prev = findFirstTokenBeforeArguments(node, context);
+    for (const n of node.arguments) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        walk(comma, context, info);
+        info.prev = comma;
+      }
+      walk(n, context, info);
+      info.prev = n;
+    }
     info.context = currContext;
   }
 
