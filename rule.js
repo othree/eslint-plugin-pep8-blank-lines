@@ -115,8 +115,15 @@ const walk = function (node, context, info, debug) {
   // > expression > expressions
 
   if (node.declarations && node.declarations.length) {
-    info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
+    info.prev = null;
     for (const n of node.declarations) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        walk(comma, context, info);
+        info.prev = comma;
+      } else {
+        info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
+      }
       walk(n, context, info);
       info.prev = n;
     }
@@ -235,8 +242,15 @@ const walk = function (node, context, info, debug) {
   if (node.params && node.params.length) {
     const currContext = info.context;
     info.context = {type: 'FunctionParams'};
-    info.prev = findFirstTokenBeforeParams(node, context);
+    info.prev = null;
     for (const n of node.params) {
+      if (info.prev) {
+        comma = context.getTokenBefore(n);
+        walk(comma, context, info);
+        info.prev = comma;
+      } else {
+        info.prev = findFirstTokenBeforeParams(node, context);
+      }
       walk(n, context, info);
       info.prev = n;
     }
@@ -273,15 +287,14 @@ const walk = function (node, context, info, debug) {
   if (node.properties && node.properties.length) {
     const currContext = info.context;
     info.context = node;
-
-    info.prev = findTokenBefore(node.properties[0], context);
+    info.prev = null;
     for (const n of node.properties) {
       if (info.prev) {
         comma = context.getTokenBefore(n);
-        if (isComma(comma)) {
-          walk(comma, context, info);
-          info.prev = comma;
-        }
+        walk(comma, context, info);
+        info.prev = comma;
+      } else {
+        info.prev = findTokenBefore(node.properties[0], context);
       }
       walk(n, context, info);
       info.prev = n;
@@ -293,15 +306,14 @@ const walk = function (node, context, info, debug) {
   if (node.elements && node.elements.length) {
     const currContext = info.context;
     info.context = node;
-
-    info.prev = findTokenBefore(node.elements[0], context);
+    info.prev = null;
     for (const n of node.elements) {
       if (info.prev) {
         comma = context.getTokenBefore(n);
-        if (isComma(comma)) {
-          walk(comma, context, info);
-          info.prev = comma;
-        }
+        walk(comma, context, info);
+        info.prev = comma;
+      } else {
+        info.prev = findTokenBefore(node.elements[0], context);
       }
       walk(n, context, info);
       info.prev = n;
@@ -384,12 +396,14 @@ const walk = function (node, context, info, debug) {
   if (node.arguments && node.arguments.length) {
     const currContext = info.context;
     info.context = {type: 'CallArguments'};
-    info.prev = findFirstTokenBeforeArguments(node, context);
+    info.prev = null;
     for (const n of node.arguments) {
       if (info.prev) {
         comma = context.getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
+      } else {
+        info.prev = findFirstTokenBeforeArguments(node, context);
       }
       walk(n, context, info);
       info.prev = n;
