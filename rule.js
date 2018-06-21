@@ -257,6 +257,22 @@ const walk = function (node, context, info, debug) {
     info.context = currContext;
   }
 
+  if (node.tag) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = null;
+    walk(node.tag, context, info);
+    info.context = currContext;
+  }
+
+  if (node.quasi) {
+    const currContext = info.context;
+    info.context = node;
+    info.prev = node.tag;
+    walk(node.quasi, context, info);
+    info.context = currContext;
+  }
+
   if (node.body) {
     const currContext = info.context;
     info.context = node;
