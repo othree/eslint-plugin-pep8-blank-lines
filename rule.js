@@ -20,10 +20,13 @@ const isComma = UTILS.isComma;
 
 const findParamsLoc = UTILS.findParamsLoc;
 
+const DEBUG_LEVEL_1 = 1;
+const DEBUG_LEVEL_2 = 2;
+const DEBUG_LEVEL_3 = 3;
 
 const linesBetween = (top, bottom, rule, callback, debug) => {
-  if (debug) { console.log('[top-bottom]', top, bottom); }
-  callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [top, bottom, rule, callback]);
+  if (debug >= DEBUG_LEVEL_2) { console.log('[top-bottom]', top, bottom); }
+  callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [debug, top, bottom, rule, callback]);
 }
 
 
@@ -38,7 +41,6 @@ const recursiveLinesBetween = (nodes, info, callback, debug) => {
 
   for (let i = 0; i < nodes.length; i += 1) {
     const bottom = nodes[i];
-    // if (debug) { console.log('[top-bottom]', top, bottom); }
     info.current = bottom;
     linesBetween(top, bottom, ruleFor(info), callback, debug);
     top = bottom;
@@ -49,12 +51,14 @@ const recursiveLinesBetween = (nodes, info, callback, debug) => {
 };
 
 
-const checkCallback = context => (ok, n, [top, bottom, rule, callback]) => {
-  // if (!ok) { console.log('[report][rule]', rule); }
-  // if (!ok) { console.log('[report][prev]', top); }
-  // if (!ok) { console.log('[report][curr]', bottom); }
-  // if (!ok) { console.log('[report][msg]', messages[rule]); }
+const checkCallback = context => (ok, n, [debug, top, bottom, rule, callback]) => {
   if (!ok) { context.report(bottom, messages[rule]); }
+
+  // DEBUG_LEVEL_1
+  if (!ok && debug) { console.log('[report][rule]', rule); }
+  if (!ok && debug) { console.log('[report][prev]', top); }
+  if (!ok && debug) { console.log('[report][curr]', bottom); }
+  if (!ok && debug) { console.log('[report][msg]', messages[rule]); }
 };
 
 
