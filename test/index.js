@@ -26,15 +26,26 @@ const INVALID = 'test/invalids/';
 const valids = readdir(VALID).filter(hiddenFilter).filter(testFilter).map(prefixdir(VALID));
 const invalids = readdir(INVALID).filter(hiddenFilter).filter(testFilter).map(prefixdir(INVALID));
 
-ruleTester.run('pep8-blank-lines', rule, {
-  valid: valids.map(readfile),
-  invalid: invalids.map(filename => { 
-    const msgkey = readmsgkey(filename);
-    const msg = messages[msgkey] || 'Unspecified Invalid';
-    // console.log('[expect][msg]', msg);
-    return {
-      code: readfile(filename),
-      errors: [{ message: msg }],
-    };
-  }),
+valids.map(filename => {
+  console.log(filename);
+  ruleTester.run('pep8-blank-lines', rule, {
+    valid: [readfile(filename)],
+    invalid: [],
+  });
 });
+
+invalids.map(filename => {
+  console.log(filename);
+
+  const msgkey = readmsgkey(filename);
+  const msg = messages[msgkey] || 'Unspecified Invalid';
+
+  ruleTester.run('pep8-blank-lines', rule, {
+    valid: [],
+    invalid: [{
+        code: readfile(filename),
+        errors: [{ message: msg }],
+    }],
+  });
+});
+
