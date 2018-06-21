@@ -55,6 +55,7 @@ const INLINE_EXPRESSIONS = [
   'AwaitExpression',
   'TaggedTemplateExpression',
   'TemplateExpression',
+  'LabeledStatement',
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);

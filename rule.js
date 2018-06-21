@@ -277,6 +277,14 @@ const walk = function (node, context, info, debug) {
     info.context = currContext;
   }
 
+  if (node.label) {
+    const currContext = info.context;
+    info.context = node;
+    const nodes = [node.label, context.getTokenAfter(node.label)];
+    recursiveLinesBetween(nodeAndComments(nodes, context, false), info, checkCallback(context));
+    info.prev = nodes[1];
+  }
+
   if (node.body) {
     const currContext = info.context;
     info.context = node;
