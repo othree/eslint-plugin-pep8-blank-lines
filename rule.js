@@ -5,7 +5,6 @@ const UTILS = require('./utils');
 
 const messages = require('./messages.js');
 
-const findTokenBefore = UTILS.findTokenBefore;
 const findFirstTokenBeforeBody = UTILS.findFirstTokenBeforeBody;
 const findFirstTokenBeforeParams = UTILS.findFirstTokenBeforeParams;
 const findFirstTokenBeforeArguments = UTILS.findFirstTokenBeforeArguments;
@@ -17,6 +16,9 @@ const nodeAndComments = UTILS.nodeAndComments;
 
 const isNew = UTILS.isNew;
 const isComma = UTILS.isComma;
+const isUnary = UTILS.isUnary;
+const isAwait = UTILS.isAwait;
+const isThrow = UTILS.isThrow;
 
 const findParamsLoc = UTILS.findParamsLoc;
 
@@ -27,7 +29,7 @@ const DEBUG_LEVEL_3 = 3;
 const linesBetween = (top, bottom, rule, callback, debug) => {
   if (debug >= DEBUG_LEVEL_2) { console.log('[top-bottom]', top, bottom); }
   callback(RULES[rule](top.loc.end.line, bottom.loc.start.line), bottom, [debug, top, bottom, rule, callback]);
-}
+};
 
 
 /**
@@ -67,6 +69,9 @@ const walk = function (node, context, info, debug) {
     return;
   }
 
+  const sourceCode = context.getSourceCode();
+  const getTokenBefore = n => sourceCode.getTokenBefore(n);
+
   let cursorLine = node.loc.start.line;
   if (node.type === 'Program') {
     cursorLine = 0;
@@ -79,7 +84,7 @@ const walk = function (node, context, info, debug) {
      * ex: SequenceExpression
      */
     if (info.prev) {
-      const comments = context.getCommentsBefore(node);
+      const comments = sourceCode.getCommentsBefore(node);
       const nodes = [...comments, node];
       nodes.unshift(info.prev);
 
@@ -122,11 +127,11 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.declarations) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       } else {
-        info.prev = context.getTokenBefore(node.declarations[0].id); // get var/let/const
+        info.prev = getTokenBefore(node.declarations[0].id); // get var/let/const
       }
       walk(n, context, info);
       info.prev = n;
@@ -134,7 +139,7 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.init) {
-    info.prev = findTokenBefore(node.init, context);
+    info.prev = getTokenBefore(node.init);
     const currContext = info.context;
     info.context = node;
     walk(node.init, context, info);
@@ -143,7 +148,7 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.test) {
-    info.prev = findTokenBefore(node.test, context);
+    info.prev = getTokenBefore(node.test);
     const currContext = info.context;
     info.context = node;
     walk(node.test, context, info);
@@ -152,7 +157,7 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.update) {
-    info.prev = findTokenBefore(node.update, context);
+    info.prev = getTokenBefore(node.update);
     const currContext = info.context;
     info.context = node;
     walk(node.update, context, info);
@@ -161,7 +166,7 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.cases && node.cases.length) {
-    info.prev = findTokenBefore(node.cases[0], context);
+    info.prev = getTokenBefore(node.cases[0]);
     const currContext = info.context;
     info.context = node;
     for (const n of node.cases) {
@@ -182,7 +187,7 @@ const walk = function (node, context, info, debug) {
   if (node.alternate) {
     const currContext = info.context;
     info.context = node;
-    info.prev = findTokenBefore(node.alternate, context);
+    info.prev = getTokenBefore(node.alternate);
     walk(node.alternate, context, info);
     info.prev = node.alternate;
     info.context = currContext;
@@ -191,7 +196,7 @@ const walk = function (node, context, info, debug) {
   if (node.block) {
     const currContext = info.context;
     info.context = node;
-    info.prev = findTokenBefore(node.block, context);
+    info.prev = getTokenBefore(node.block);
     walk(node.block, context, info);
     info.prev = node.block;
     info.context = currContext;
@@ -200,7 +205,7 @@ const walk = function (node, context, info, debug) {
   if (node.handler) {
     const currContext = info.context;
     info.context = node;
-    info.prev = findTokenBefore(node.handler, context);
+    info.prev = getTokenBefore(node.handler);
     walk(node.handler, context, info);
     info.prev = node.handler;
     info.context = currContext;
@@ -209,7 +214,7 @@ const walk = function (node, context, info, debug) {
   if (node.finalizer) {
     const currContext = info.context;
     info.context = node;
-    info.prev = findTokenBefore(node.finalizer, context);
+    info.prev = getTokenBefore(node.finalizer);
     walk(node.finalizer, context, info);
     info.prev = node.finalizer;
     info.context = currContext;
@@ -220,21 +225,21 @@ const walk = function (node, context, info, debug) {
     const nodes = [];
     const params = findParamsLoc(context, node);
     if (node.type === 'ArrowFunctionExpression') {
-      nodes.push(params)
+      nodes.push(params);
       if (node.async) {
-        nodes.unshift(context.getTokenBefore(params));
+        nodes.unshift(getTokenBefore(params));
       }
     } else { // Function expression, Method definition
-      nodes.unshift(params)
+      nodes.unshift(params);
       if (node.generator) {
-        nodes.unshift(context.getTokenBefore(nodes[0]));
+        nodes.unshift(getTokenBefore(nodes[0]));
       }
       if (node.id) {
-        nodes.unshift(context.getTokenBefore(nodes[0]));
+        nodes.unshift(getTokenBefore(nodes[0]));
       }
-      nodes.unshift(context.getTokenBefore(nodes[0]));
+      nodes.unshift(getTokenBefore(nodes[0]));
       if (node.async) {
-        nodes.unshift(context.getTokenBefore(nodes[0]));
+        nodes.unshift(getTokenBefore(nodes[0]));
       }
     }
     const currContext = info.context;
@@ -249,7 +254,7 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.params) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       } else {
@@ -278,9 +283,9 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.label) {
-    const currContext = info.context;
+    // const currContext = info.context;
     info.context = node;
-    const nodes = [node.label, context.getTokenAfter(node.label)];
+    const nodes = [node.label, sourceCode.getTokenAfter(node.label)];
     recursiveLinesBetween(nodeAndComments(nodes, context, false), info, checkCallback(context));
     info.prev = nodes[1];
   }
@@ -318,11 +323,11 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.properties) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       } else {
-        info.prev = findTokenBefore(node.properties[0], context);
+        info.prev = getTokenBefore(node.properties[0]);
       }
       walk(n, context, info);
       info.prev = n;
@@ -337,11 +342,11 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.elements) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       } else {
-        info.prev = findTokenBefore(node.elements[0], context);
+        info.prev = getTokenBefore(node.elements[0]);
       }
       walk(n, context, info);
       info.prev = n;
@@ -357,7 +362,7 @@ const walk = function (node, context, info, debug) {
 
   if (node.key) {
     if (node.computed) {
-      info.prev = context.getTokenBefore(node.key);
+      info.prev = getTokenBefore(node.key);
     } else {
       info.prev = null;
     }
@@ -370,7 +375,7 @@ const walk = function (node, context, info, debug) {
 
   if (node.value && node.value.type) {
     if (node.type === 'ClassProperty') {
-      info.prev = context.getTokenAfter(node.key);
+      info.prev = sourceCode.getTokenAfter(node.key);
     }
     walk(node.value, context, info);
   }
@@ -382,7 +387,7 @@ const walk = function (node, context, info, debug) {
   if (node.operator || (node.left && node.right)) {
     const currContext = info.context;
     info.context = node;
-    const op = context.getTokenBefore(node.right || node.argument);
+    const op = getTokenBefore(node.right || node.argument);
     if (node.left) {
       walk(op, context, info);
     }
@@ -399,7 +404,7 @@ const walk = function (node, context, info, debug) {
   }
 
   if (node.callee) {
-    const op = context.getTokenBefore(node.callee);
+    const op = getTokenBefore(node.callee);
     if (isNew(op)) {
       const currContext = info.context;
       info.context = node;
@@ -412,10 +417,10 @@ const walk = function (node, context, info, debug) {
     }
   }
 
-  if (node.argument && !(node.operator && !node.prefix)) {
+  if (node.argument && (isUnary(node) || isAwait(node) || isThrow(node))) {
     const currContext = info.context;
     info.context = node;
-    info.prev = context.getTokenBefore(node.argument);
+    info.prev = getTokenBefore(node.argument);
     walk(node.argument, context, info);
     info.prev = node.argument;
     info.context = currContext;
@@ -427,7 +432,7 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.arguments) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       } else {
@@ -454,7 +459,7 @@ const walk = function (node, context, info, debug) {
     info.prev = null;
     for (const n of node.expressions) {
       if (info.prev) {
-        comma = context.getTokenBefore(n);
+        const comma = getTokenBefore(n);
         walk(comma, context, info);
         info.prev = comma;
       }

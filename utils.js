@@ -22,7 +22,7 @@ const BLOCK_DECLARATION_STARTS = BLOCK_DECLARATIONS.map(name => `${name}Start`);
 
 const META_EXPRESSION = [
   'SequenceExpression',
-]
+];
 
 const BLOCK_EXPRESSIONS = [
   'FunctionExpression',
@@ -40,9 +40,9 @@ const OBJECT = [
 const PROPERTY_KEY = [
   'MethodDefinition',
   'Property',
-]
+];
 
-const INLINE_EXPRESSIONS = [
+const INLINE_SYNTAX = [
   'AssignmentExpression',
   'UnaryExpression',
   'UpdateExpression',
@@ -56,6 +56,7 @@ const INLINE_EXPRESSIONS = [
   'TaggedTemplateExpression',
   'TemplateExpression',
   'LabeledStatement',
+  'YieldExpression',
 ];
 
 const BLOCK_EXPRESSION_STARTS = BLOCK_EXPRESSIONS.map(name => `${name}Start`);
@@ -74,6 +75,10 @@ const CONTROL_FLOW_STATEMENTS = [
 
 const THROW_STATEMENT = [
   'ThrowStatement',
+];
+
+const STATEMENTS = [
+  'ExpressionStatement',
 ];
 
 const DECLARATIONS = [
@@ -95,7 +100,7 @@ const CALLS = [
 ];
 
 const CLASS_METHODS = [
-  'MethodDefinition'
+  'MethodDefinition',
 ];
 
 const COMMENTS = [
@@ -142,7 +147,7 @@ const isControlFlowStatement = node =>
 
 
 const isStatement = node =>
-  DECLARATIONS.includes(node.type);
+  STATEMENTS.includes(node.type) || DECLARATIONS.includes(node.type);
 
 
 const isDeclarator = node =>
@@ -162,7 +167,7 @@ const isPropertyKey = node =>
 
 
 const isInline = node =>
-  INLINE_EXPRESSIONS.includes(node.type);
+  INLINE_SYNTAX.includes(node.type);
 
 
 const isFor = node =>
@@ -220,8 +225,8 @@ const isParenthesised = (context, node) => {
     const nextToken = context.getTokenAfter(node[node.length - 1]);
 
     return Boolean(previousToken && nextToken) &&
-        previousToken.value === "(" && previousToken.range[1] <= node.range[0] &&
-        nextToken.value === ")" && nextToken.range[0] >= node.range[1];
+        previousToken.value === '(' && previousToken.range[1] <= node.range[0] &&
+        nextToken.value === ')' && nextToken.range[0] >= node.range[1];
   } else {
     return ASTUTILS.isParenthesised(context, node);
   }
@@ -260,11 +265,6 @@ exports.findParamsLoc = (context, node) => {
     n = {loc, range};
   }
   return n;
-};
-
-
-exports.findTokenBefore = (node, context) => {
-  return context.getTokenBefore(node);
 };
 
 
@@ -347,7 +347,10 @@ exports.ruleFor = (info) => {
     } else if ((isStatement(info.prev) && isComment(info.current)) || (isComment(info.prev) && isStatement(info.current))) {
       rule = 'maxtwo';
     } else {
-      rule = (info.prev.type === 'ProgramStart') ? 'maxtwo' : 'two';
+      rule = info.prev.type === 'ProgramStart' ? 'maxtwo' : 'two';
+    }
+    if (rule.indexOf('max') === -1 && info.prev.type === 'ProgramStart') {
+      rule = `zero${rule}`;
     }
   } else {
     if (isBlock(info.prev)) {
@@ -385,7 +388,7 @@ exports.nodeAndComments = (nodes, context, firstComments = true) => {
   for (let i = 0; i < nodes.length; i++) {
     const n = nodes[i];
 
-    if (i === 0 && !firstComments) { 
+    if (i === 0 && !firstComments) {
       allnodes.push(n);
       continue;
     }
@@ -393,9 +396,18 @@ exports.nodeAndComments = (nodes, context, firstComments = true) => {
     allnodes.push(...context.getCommentsBefore(n));
     allnodes.push(n);
   }
-  
+
   return allnodes;
 };
+
+exports.isUnary = node =>
+  node.type === 'UnaryExpression';
+
+exports.isAwait = node =>
+  node.type === 'AwaitExpression';
+
+exports.isThrow = node =>
+  node.type === 'ThrowStatement';
 
 exports.isNew = isNew;
 exports.isComma = isComma;
