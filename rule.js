@@ -377,7 +377,9 @@ const walk = function (node, context, info, debug) {
     if (node.type === 'ClassProperty') {
       info.prev = sourceCode.getTokenAfter(node.key);
     }
-    walk(node.value, context, info);
+    if (node.shorthand !== true) {
+      walk(node.value, context, info);
+    }
   }
 
   if (node.left) {
