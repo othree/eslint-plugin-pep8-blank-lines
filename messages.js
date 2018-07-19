@@ -6,7 +6,7 @@ module.exports = {
   maxzero: 'Expected no blank line here',
   maxone: 'Expected max one blank line here',
   maxtwo: 'Expected max two blank lines here',
-  zerosame: 'Expected no new line here.',
+  zerosame: 'Expected no blank line here.',
   zeroone: 'Expected max one blank line here',
   zerotwo: 'Expected zero or two blank lines here',
 };
