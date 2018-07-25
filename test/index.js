@@ -1,7 +1,7 @@
-const rule = require('../rule.js');
+const rule = require('../lib/rule.js');
 const load = require('./load.js');
 
-const messages = require('../messages.js');
+const messages = require('../lib/blank-line-checker.js').messages;
 
 const RuleTester = require('eslint').RuleTester;
 
