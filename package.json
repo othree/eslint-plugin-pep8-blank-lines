@@ -28,7 +28,7 @@
     "eslint-config-othree-style": "^0.0.8",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.11.0",
-    "eslint-plugin-pep8-blank-lines": "^0.0.2",
+    "eslint-plugin-pep8-blank-lines": "^0.0.3",
     "eslint-plugin-no-parameter-e": "^0.0.2",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
