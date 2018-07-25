@@ -24,10 +24,8 @@
   "homepage": "https://github.com/othree/eslint-plugin-pep8-blank-lines#readme",
   "devDependencies": {
     "babel-eslint": "^8.2.5",
-    "eslint": "^4.19.1"
-  },
-  "peerDependencies": {
-    "eslint-config-othree-style": "^0.0.7",
+    "eslint": "^4.19.1",
+    "eslint-config-othree-style": "^0.0.8",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-pep8-blank-lines": "^0.0.2",
