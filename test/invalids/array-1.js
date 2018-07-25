@@ -2,7 +2,7 @@
 
 
 const arr = [
-  1,
+  fun(),
   2,
 
 
