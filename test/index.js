@@ -43,8 +43,8 @@ invalids.map(filename => {
   ruleTester.run('pep8-blank-lines', rule, {
     valid: [],
     invalid: [{
-        code: readfile(filename),
-        errors: [{ message: msg }],
+      code: readfile(filename),
+      errors: [{ message: msg }],
     }],
   });
 });
