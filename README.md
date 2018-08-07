@@ -8,12 +8,15 @@ Now in Beta. Not widely test.
 
 ## Why
 
-I am very like the blank line rule introduced by [PEP8][]. Basically, it allows
-two blank line between top level classes or functions. So I can keep more spaces 
-between bigger objects. An article or a book need to have good spacing between 
-elements to make it easy to read. I believe source code should too. But current 
+The space between chapters and between paragraphs should be different make it 
+have good readibility. I believe source code should too. But current 
 ESLint rules can't have different blank line rule in different level of scope.
-So I try to implement it.
+
+When I write Python and found the [PEP8][] coding style. I fall in love with 
+this simple but elegant rule. Basically, it allows two blank line between top 
+level classes or functions. So I can keep more spaces between top level objects.
+And I decide to implement it in ESLint.
+
 
 ## Usage
 
