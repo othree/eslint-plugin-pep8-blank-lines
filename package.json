@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-pep8-blank-lines",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Ref: https://www.python.org/dev/peps/pep-0008/#blank-lines",
   "main": "index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://www.npmjs.com/package/eslint-plugin-pep8-blank-lines",
   "peerDependencies": {
-    "eslint": "^4.19.1"
+    "eslint": "^5.3.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.5",
@@ -32,8 +32,11 @@
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-no-parameter-e": "^0.0.2",
     "eslint-plugin-node": "^6.0.1",
-    "eslint-plugin-pep8-blank-lines": "0.0.3",
+    "eslint-plugin-pep8-blank-lines": "0.0.4",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0"
+  },
+  "dependencies": {
+    "eslint": "^5.3.0"
   }
 }
