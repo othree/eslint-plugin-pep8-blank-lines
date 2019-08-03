@@ -11,7 +11,7 @@ const readdir = load.readdir;
 const readmsgkey = load.readmsgkey;
 
 const ruleTester = new RuleTester({
-  parser: 'babel-eslint',
+  parser: require.resolve('babel-eslint'),
 });
 
 const testCase = process.argv[2] || '*';
@@ -29,7 +29,9 @@ const invalids = readdir(INVALID).filter(hiddenFilter).filter(testFilter).map(pr
 valids.map(filename => {
   console.log(filename);
   ruleTester.run('pep8-blank-lines', rule, {
-    valid: [readfile(filename)],
+    valid: [{
+      code: readfile(filename)
+    }],
     invalid: [],
   });
 });
